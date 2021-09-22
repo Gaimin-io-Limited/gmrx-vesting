@@ -1,0 +1,11 @@
+.idea
+*.iml
+
+node_modules
+package-lock.json
+
+.env
+secrets.json
+
+cache
+artifacts
