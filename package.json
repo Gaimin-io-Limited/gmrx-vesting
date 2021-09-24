@@ -1,7 +1,7 @@
 {
   "name": "gmrx-vesting",
   "version": "1.0.0",
-  "description": "Vesting smart contract to distribute GMRX tokens ",
+  "description": "Vesting smart contract to distribute GMRX tokens",
   "main": "hardhat.config.js",
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
