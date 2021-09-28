@@ -7,41 +7,56 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TimeLockedWallet is Ownable {
 
-    uint256 public _icoDate;
-
-    constructor(address owner, uint256 unlockDate) {
-        transferOwnership(owner);
-        _icoDate = unlockDate;
+    struct LockBoxStruct {
+        uint amount;
+        uint unlockTime;
+        bool paid;
     }
 
-    // callable by owner only, after specified time
-    function withdraw() onlyOwner public {
-        require(block.timestamp >= _icoDate);
-        //now send all the balance
-        payable(msg.sender).transfer(address(this).balance);
-        Withdrew(msg.sender, address(this).balance);
+    address public tokenContract;
+    LockBoxStruct[] lockBoxStructs;
+
+    constructor(address _owner, address _tokenContract, uint _amount, uint _unlockTime) {
+        transferOwnership(_owner);
+        tokenContract = _tokenContract;
+        LockBoxStruct memory box;
+        box.amount = _amount;
+        box.unlockTime = _unlockTime;
+        box.paid = false;
+        lockBoxStructs.push(box);
     }
 
-    // callable by owner only, after specified time, only for Tokens implementing ERC20
-    function withdrawTokens(address tokenContract) onlyOwner public {
-        require(block.timestamp >= _icoDate);
-        ERC20 token = ERC20(tokenContract);
-        //now send all the token balance
-        uint256 tokenBalance = token.balanceOf(address(this));
-        token.transfer(owner(), tokenBalance);
-        WithdrewTokens(tokenContract, msg.sender, tokenBalance);
+    function lockedAmount() public view returns (uint amount) {
+        for (uint i = 0; i < lockBoxStructs.length; i++) {
+            LockBoxStruct memory box = lockBoxStructs[i];
+            if (box.paid == false) {
+                amount = amount + box.amount;
+            }
+        }
+        return amount;
     }
 
-    function info() public view returns (address, uint256, uint256) {
-        return (owner(), _icoDate, address(this).balance);
+    function info() public view returns (address, LockBoxStruct[] memory) {
+        return (tokenContract, lockBoxStructs);
     }
 
-    // keep all the ether sent to this address
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
+    function withdrawTokens() public onlyOwner {
+        for (uint i = 0; i < lockBoxStructs.length; i++) {
+            LockBoxStruct storage box = lockBoxStructs[i];
+            if (box.unlockTime <= block.timestamp) {
+                if (box.paid == false) {
+                    ERC20 token = ERC20(tokenContract);
+                    token.transfer(owner(), box.amount);
+                    emit WithdrewTokens(box.amount);
+                    box.paid = true;
+                }
+            } else {
+                emit LockedFunds(box.amount, box.unlockTime);
+            }
+        }
     }
 
-    event Received(address from, uint256 amount);
-    event Withdrew(address to, uint256 amount);
-    event WithdrewTokens(address tokenContract, address to, uint256 amount);
+    event WithdrewTokens(uint amount);
+    event LockedFunds(uint amount, uint unlockTime);
+
 }
