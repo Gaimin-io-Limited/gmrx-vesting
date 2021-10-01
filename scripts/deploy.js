@@ -1,14 +1,17 @@
 const hre = require("hardhat");
 
 async function main() {
+    let gmrxAddress = "0x9037dD49BeD73b3b2a99fCE722d2F9207027Bc3e";
+
     const contractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
-    const contract = await contractFactory.deploy();
+    let tlwAddress = "0xA89b596273c184568773c5803Fa6c1817C06CA50";
+    const contract = await contractFactory.deploy(gmrxAddress, tlwAddress);
     await contract.deployed();
 
     // const contractFactory = await hre.ethers.getContractFactory("TimeLockedWallet");
-    // const contract = await contractFactory.deploy("0xBD8911B2967efE7C98A731f5332A76526902AEe4", "0x9037dD49BeD73b3b2a99fCE722d2F9207027Bc3e", 11, 1632755762);
+    // const contract = await contractFactory.deploy();
     // await contract.deployed();
-
+    // await contract.initialize("0x0000000000000000000000000000000000000000", gmrxAddress, 0, 1, 2000000000, 0);
     console.log("Contract deployed to:", contract.address);
 }
 
