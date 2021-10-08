@@ -14,35 +14,30 @@ contract TimeLockedWallet is Initializable {
         bool paid;
     }
 
-    modifier onlyOwner() {
-        require(_owner == msg.sender, "Caller is not the owner");
-        _;
-    }
-
     address public _owner;
-    address public _tokenContract;
-    LockBoxStruct[] public _lockBoxStructs;
+    address public _tokenAddress;
+    LockBoxStruct[] public _lockBoxes;
 
-    function initialize(address owner, address tokenContract, uint amount,
+    function initialize(address owner, address tokenAddress, uint amount,
         uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public initializer {
-        _validateInitialize(owner, tokenContract, amount, numberOfPeriods, firstUnlockTime);
+        _validateInitialize(owner, tokenAddress, amount, numberOfPeriods, firstUnlockTime);
         _owner = owner;
-        _tokenContract = tokenContract;
+        _tokenAddress = tokenAddress;
         uint periodAmount = amount / numberOfPeriods;
         for (uint i = 0; i < numberOfPeriods; i++) {
             LockBoxStruct memory box;
             box.amount = periodAmount;
             box.unlockTime = firstUnlockTime + i * periodDuration;
             box.paid = false;
-            _lockBoxStructs.push(box);
+            _lockBoxes.push(box);
         }
-        LockBoxStruct storage lastBox = _lockBoxStructs[numberOfPeriods - 1];
+        LockBoxStruct storage lastBox = _lockBoxes[numberOfPeriods - 1];
         lastBox.amount = lastBox.amount + amount % numberOfPeriods;
     }
 
     function lockedAmount() public view returns (uint amount) {
-        for (uint i = 0; i < _lockBoxStructs.length; i++) {
-            LockBoxStruct memory box = _lockBoxStructs[i];
+        for (uint i = 0; i < _lockBoxes.length; i++) {
+            LockBoxStruct memory box = _lockBoxes[i];
             if (box.paid == false) {
                 amount = amount + box.amount;
             }
@@ -51,8 +46,8 @@ contract TimeLockedWallet is Initializable {
     }
 
     function readyToWithdraw() public view returns (uint amount) {
-        for (uint i = 0; i < _lockBoxStructs.length; i++) {
-            LockBoxStruct memory box = _lockBoxStructs[i];
+        for (uint i = 0; i < _lockBoxes.length; i++) {
+            LockBoxStruct memory box = _lockBoxes[i];
             if (box.unlockTime <= block.timestamp && box.paid == false) {
                 amount = amount + box.amount;
             }
@@ -60,14 +55,14 @@ contract TimeLockedWallet is Initializable {
         return amount;
     }
 
-    function withdrawTokens() public onlyOwner {
+    function withdraw() public {
         bool isTransferred = false;
-        for (uint i = 0; i < _lockBoxStructs.length; i++) {
-            LockBoxStruct storage box = _lockBoxStructs[i];
+        for (uint i = 0; i < _lockBoxes.length; i++) {
+            LockBoxStruct storage box = _lockBoxes[i];
             if (box.unlockTime <= block.timestamp && box.paid == false) {
-                ERC20 token = ERC20(_tokenContract);
+                ERC20 token = ERC20(_tokenAddress);
                 SafeERC20.safeTransfer(token, _owner, box.amount);
-                emit WithdrewTokens(box.amount);
+                emit Withdrawal(box.amount);
                 box.paid = true;
                 isTransferred = true;
             }
@@ -77,14 +72,14 @@ contract TimeLockedWallet is Initializable {
         }
     }
 
-    function _validateInitialize(address owner, address tokenContract, uint amount,
+    function _validateInitialize(address owner, address tokenAddress, uint amount,
         uint numberOfPeriods, uint firstUnlockTime) private view {
         require(!Address.isContract(owner), "Owner should be externally-owned account and not a contract");
-        require(ERC20(tokenContract).balanceOf(address(this)) == amount, "Amount of tokens should already be transferred to this locked contract");
+        require(ERC20(tokenAddress).balanceOf(address(this)) == amount, "Amount of tokens should already be transferred to this locked contract");
         require(numberOfPeriods > 0, "There should be at least 1 unlock time");
         require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
     }
 
-    event WithdrewTokens(uint amount);
+    event Withdrawal(uint amount);
 
 }

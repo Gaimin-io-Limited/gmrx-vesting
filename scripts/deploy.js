@@ -4,7 +4,7 @@ async function main() {
     let gmrxAddress = "0x9037dD49BeD73b3b2a99fCE722d2F9207027Bc3e";
 
     const contractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
-    let tlwAddress = "0xA89b596273c184568773c5803Fa6c1817C06CA50";
+    let tlwAddress = "0x06E5D057280B9Cba511809c393c8c66C64ad675b";
     const contract = await contractFactory.deploy(gmrxAddress, tlwAddress);
     await contract.deployed();
 

@@ -13,9 +13,9 @@ contract TimeLockedWalletFactory is Ownable {
     address public _tokenAddress;
     address public _tlwAddress;
 
-    constructor(address tokenContract, address tlwContract) {
-        setTokenAddress(tokenContract);
-        setTLWAddress(tlwContract);
+    constructor(address tokenAddress, address tlwAddress) {
+        setTokenAddress(tokenAddress);
+        setTLWAddress(tlwAddress);
     }
 
     function getWallets(address user) public view onlyOwner returns (address[] memory) {
