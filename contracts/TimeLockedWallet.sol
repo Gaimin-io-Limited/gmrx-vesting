@@ -60,10 +60,10 @@ contract TimeLockedWallet is Initializable {
         for (uint i = 0; i < _lockBoxes.length; i++) {
             LockBoxStruct storage box = _lockBoxes[i];
             if (box.unlockTime <= block.timestamp && box.paid == false) {
+                box.paid = true;
                 ERC20 token = ERC20(_tokenAddress);
                 SafeERC20.safeTransfer(token, _owner, box.amount);
                 emit Withdrawal(box.amount);
-                box.paid = true;
                 isTransferred = true;
             }
         }
