@@ -4,9 +4,8 @@ require("@nomiclabs/hardhat-etherscan");
 require('dotenv').config();
 
 const privateKey = process.env.PRIVATE_KEY;
-const polygonscanApikey = process.env.POLYGONSCAN_API_KEY;
-const maticvigilAppId = process.env.MATICVIGIL_APP_ID;
-
+const polygonscanApikey = "IN194AG23PKQFB2VIEJMR7KQUHGXDXDUHJ";
+const maticvigilAppId = "fd0ba0c297cf03e21d0db62c4b1afc17b473d9f8";
 module.exports = {
     defaultNetwork: "mumbai",
     networks: {
