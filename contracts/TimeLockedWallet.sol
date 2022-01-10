@@ -56,7 +56,6 @@ contract TimeLockedWallet is Initializable {
     }
 
     function withdraw() public {
-        bool isTransferred = false;
         for (uint i = 0; i < _lockBoxes.length; i++) {
             LockBoxStruct storage box = _lockBoxes[i];
             if (box.unlockTime <= block.timestamp && box.paid == false) {
@@ -64,12 +63,10 @@ contract TimeLockedWallet is Initializable {
                 ERC20 token = ERC20(_tokenAddress);
                 SafeERC20.safeTransfer(token, _owner, box.amount);
                 emit Withdrawal(box.amount);
-                isTransferred = true;
+                return;
             }
         }
-        if (!isTransferred) {
-            revert("Nothing to withdraw");
-        }
+        revert("Nothing to withdraw");
     }
 
     function _validateInitialize(address owner, address tokenAddress, uint amount,

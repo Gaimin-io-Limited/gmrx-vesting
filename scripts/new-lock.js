@@ -5,7 +5,7 @@ async function main() {
     const token = tokenFactory.attach("0x9037dD49BeD73b3b2a99fCE722d2F9207027Bc3e");
 
     const contractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
-    const factoryAddress = "0x07b1e78Ea789FD6755b6C62D23301FC7074be6b0";
+    const factoryAddress = "0x3949FDea81eef50A4a0F4127F79a86b14037dcCb";
     const contract = contractFactory.attach(factoryAddress);
 
     let amount = (Math.floor(Math.random() * 1000) + 1) * 1000000000000000000;
