@@ -3,6 +3,7 @@ const fs = require('fs');
 const results = [];
 
 const startSalaryTime = Math.floor(new Date().getTime() / 1000)
+const amountMultiplier = '000000000000000000';
 
 const unlockEquity = startSalaryTime + (2678400*6);
 const unlockSeed = startSalaryTime + (2678400*2);
@@ -21,25 +22,26 @@ fs.createReadStream(__dirname+'/username.csv')
     .pipe(csv())
     .on('data', (data) => results.push(data))
     .on('end', () => {
-        takeGroup(results)
+        locker(results)
+        console.log( "\x1b[2m",'Done')
     });
 
 
-function takeGroup(data){
-       let Equity = data.filter(item => item['Group'] === 'Equity');
-       let Seed = data.filter(item => item['Group'] === 'Seed');
-       let Strategic = data.filter(item => item['Group'] === 'Strategic');
-       let Private = data.filter(item => item['Group'] === 'Private');
-       let Public = data.filter(item => item['Group'] === 'Public');
-       let Corporate = data.filter(item => item['Group'] === 'Corporate');
-       let Community = data.filter(item => item['Group'] === 'Community');
-       let Development = data.filter(item => item['Group'] === 'Development');
-       let Treasury = data.filter(item => item['Group'] === 'Treasury');
-       let Team = data.filter(item => item['Group'] === 'Team');
-       let NFT = data.filter(item => item['Group'] === 'NFT');
-    // console.log(Corporate)
-       locker(Corporate);
-}
+// function takeGroup(data){
+//        let Equity = data.filter(item => item['Group'] === 'Equity');
+//        let Seed = data.filter(item => item['Group'] === 'Seed');
+//        let Strategic = data.filter(item => item['Group'] === 'Strategic');
+//        let Private = data.filter(item => item['Group'] === 'Private');
+//        let Public = data.filter(item => item['Group'] === 'Public');
+//        let Corporate = data.filter(item => item['Group'] === 'Corporate');
+//        let Community = data.filter(item => item['Group'] === 'Community');
+//        let Development = data.filter(item => item['Group'] === 'Development');
+//        let Treasury = data.filter(item => item['Group'] === 'Treasury');
+//        let Team = data.filter(item => item['Group'] === 'Team');
+//        let NFT = data.filter(item => item['Group'] === 'NFT');
+//     console.log(Corporate)
+//        locker(data);
+// }
 
 
 function locker(data){
@@ -50,75 +52,58 @@ function locker(data){
 
         data.map((item) => {
 
+                amount = item.Amount + amountMultiplier;
+                wallet = item.Wallet;
+                numberOfPeriods = item.Period * 30;
+
            if ( item.Group === 'Equity') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlockEquity;
            }
 
            if (item.Group === 'Seed') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlockSeed;
            }
 
            if (item.Group === 'Strategic') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlockStrategic;
            }
 
            if ( item.Group === 'Private') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockPrivate
            }
 
            if (item.Group === 'Public') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockPublic;
            }
 
            if (item.Group === 'Corporate') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockCorporate;
            }
 
            if (item.Group === 'NFT') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockNftGD;
            }
 
            if (item.Group === 'Community') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockCommunity;
            }
 
            if (item.Group === 'Development') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockDev;
            }
 
            if (item.Group === 'Treasury') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockTreasury;
            }
 
            if (item.Group === 'Team') {
-               amount = item.Amount * 1000000000000000000;
-               wallet = item.Wallet;
                firstUnlockTime = unlnockTeam
            }
 
            let r = `${wallet +' ' + amount.toString()
-                + '  ' + numberOfPeriods  + '  ' +   unlnockCommunity  + '  ' + periodDuration }`
-                console.log(r)
+                + '  ' + numberOfPeriods  + '  ' +   firstUnlockTime  + '  ' + periodDuration }`
+                // console.log('✔' ,r)
+                console.log( "\x1b[1m","parsed:","✔",r)
 
         }
         )
