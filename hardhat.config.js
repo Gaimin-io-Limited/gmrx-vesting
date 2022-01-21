@@ -12,7 +12,9 @@ module.exports = {
         hardhat: {},
         mumbai: {
             url: `https://rpc-mumbai.maticvigil.com/v1/${maticvigilAppId}`,
-            accounts: [privateKey]
+            accounts: [privateKey],
+            gas: 2100000,
+            gasPrice: 8000000000
         },
         polygon: {
             url: `https://rpc-mainnet.maticvigil.com/v1/${maticvigilAppId}`,

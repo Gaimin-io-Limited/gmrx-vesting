@@ -17,6 +17,7 @@ const unlnockDev =  startSalaryTime + (2678400*6);
 const unlnockTreasury =  startSalaryTime + 2678400;
 const unlnockTeam =  startSalaryTime + (2678400*12);
 const periodDuration = 86400
+let params;
 
 fs.createReadStream(__dirname+'/username.csv')
     .pipe(csv())
@@ -24,6 +25,7 @@ fs.createReadStream(__dirname+'/username.csv')
     .on('end', () => {
         locker(results)
         console.log( "\x1b[2m",'Done')
+        console.log(params)
     });
 
 
@@ -100,10 +102,14 @@ function locker(data){
                firstUnlockTime = unlnockTeam
            }
 
+            params = {wallet, amount, numberOfPeriods,firstUnlockTime,periodDuration}
+
            let r = `${wallet +' ' + amount.toString()
                 + '  ' + numberOfPeriods  + '  ' +   firstUnlockTime  + '  ' + periodDuration }`
                 // console.log('✔' ,r)
-                console.log( "\x1b[1m","parsed:","✔",r)
+            //     console.log( "\x1b[1m","parsed:","✔",r)
+             console.log(params)
+            return params
 
         }
         )
