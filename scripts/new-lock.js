@@ -12,10 +12,19 @@ async function main() {
     let firstUnlockTime = Math.floor(new Date().getTime() / 1000) + 3 * 60;
     console.log("amount", amount.toString(), "time", firstUnlockTime);
 
-    await token.approve(factoryAddress, amount.toString());
+    const txAppr = await token.approve(factoryAddress, amount.toString());
+    const receiptAppr = await txAppr.wait();
     console.log("approved");
-    let result = await contract.newTimeLockedWallet("0xBD8911B2967efE7C98A731f5332A76526902AEe4", amount.toString(), 7, firstUnlockTime, 1 * 60);
-    console.log("done: ", result);
+    const txNewTWL = await contract.newTimeLockedWallet("0xBD8911B2967efE7C98A731f5332A76526902AEe4", amount.toString(), 7, firstUnlockTime, 1 * 60);
+    console.log("init newTWL");
+    const receiptNewTWL = await txNewTWL.wait();
+    console.log(receiptNewTWL);
+    for (let event of receiptNewTWL.events) {
+        if (event.event === 'Created') {
+            console.log(event.args[0])
+        }
+    }
+
 }
 
 
