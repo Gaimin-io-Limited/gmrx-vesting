@@ -1,117 +1,47 @@
-const csv = require('csv-parser');
 const fs = require('fs');
-const results = [];
 
-const startSalaryTime = Math.floor(new Date().getTime() / 1000)
-const amountMultiplier = '000000000000000000';
-
-const unlockEquity = startSalaryTime + (2678400*6);
-const unlockSeed = startSalaryTime + (2678400*2);
-const unlockStrategic =  startSalaryTime + (86400*21);
-const unlnockPrivate =  startSalaryTime + (86400*14);
-const unlnockPublic =  startSalaryTime + (86400*7);
-const unlnockCorporate =  startSalaryTime + (2678400*6);
-const unlnockCommunity =  startSalaryTime + 2678400;
-const unlnockNftGD =  startSalaryTime + 2678400;
-const unlnockDev =  startSalaryTime + (2678400*6);
-const unlnockTreasury =  startSalaryTime + 2678400;
-const unlnockTeam =  startSalaryTime + (2678400*12);
-const periodDuration = 86400
-let params;
-
-fs.createReadStream(__dirname+'/username.csv')
-    .pipe(csv())
-    .on('data', (data) => results.push(data))
-    .on('end', () => {
-        locker(results)
-        console.log( "\x1b[2m",'Done')
-        console.log(params)
-    });
-
-
-// function takeGroup(data){
-//        let Equity = data.filter(item => item['Group'] === 'Equity');
-//        let Seed = data.filter(item => item['Group'] === 'Seed');
-//        let Strategic = data.filter(item => item['Group'] === 'Strategic');
-//        let Private = data.filter(item => item['Group'] === 'Private');
-//        let Public = data.filter(item => item['Group'] === 'Public');
-//        let Corporate = data.filter(item => item['Group'] === 'Corporate');
-//        let Community = data.filter(item => item['Group'] === 'Community');
-//        let Development = data.filter(item => item['Group'] === 'Development');
-//        let Treasury = data.filter(item => item['Group'] === 'Treasury');
-//        let Team = data.filter(item => item['Group'] === 'Team');
-//        let NFT = data.filter(item => item['Group'] === 'NFT');
-//     console.log(Corporate)
-//        locker(data);
-// }
+const newWallet = [
+    {
+        wallet: '0x5f1d00a3698ab45f588D089385Cc3E3463326390',
+        amount: '1000000000000000000',
+        numberOfPeriods: 30,
+        firstUnlockTime: 1659361822,
+        periodDuration: 86400,
+        newWallet: '0xe0b128aEfB41D929A88C680e4b1478fecadA0Ed0'
+    },
+    {
+        wallet: '0x936093Ce96Af55B0f3dD20bb213dEc3e539d0FFb',
+        amount: '1000000000000000000',
+        numberOfPeriods: 30,
+        firstUnlockTime: 1648648222,
+        periodDuration: 86400,
+        newWallet: '0x92538E5fC6c85360514635EC5f353326D3EF1339'
+    },
+    {
+        wallet: '0xD4de52c348621909b1Ddbf12C1E68A3F09b5905d',
+        amount: '1000000000000000000',
+        numberOfPeriods: 30,
+        firstUnlockTime: 1659361822,
+        periodDuration: 86400,
+        newWallet: '0xA5659E520e9D74facC9012d928756d0f1C8BcD53'
+    }
+]
 
 
-function locker(data){
-    let amount;
-    let wallet;
-    let numberOfPeriods = 1;
-    let firstUnlockTime;
+function convertToCSV() {
 
-        data.map((item) => {
-
-                amount = item.Amount + amountMultiplier;
-                wallet = item.Wallet;
-                numberOfPeriods = item.Period * 30;
-
-           if ( item.Group === 'Equity') {
-               firstUnlockTime = unlockEquity;
-           }
-
-           if (item.Group === 'Seed') {
-               firstUnlockTime = unlockSeed;
-           }
-
-           if (item.Group === 'Strategic') {
-               firstUnlockTime = unlockStrategic;
-           }
-
-           if ( item.Group === 'Private') {
-               firstUnlockTime = unlnockPrivate
-           }
-
-           if (item.Group === 'Public') {
-               firstUnlockTime = unlnockPublic;
-           }
-
-           if (item.Group === 'Corporate') {
-               firstUnlockTime = unlnockCorporate;
-           }
-
-           if (item.Group === 'NFT') {
-               firstUnlockTime = unlnockNftGD;
-           }
-
-           if (item.Group === 'Community') {
-               firstUnlockTime = unlnockCommunity;
-           }
-
-           if (item.Group === 'Development') {
-               firstUnlockTime = unlnockDev;
-           }
-
-           if (item.Group === 'Treasury') {
-               firstUnlockTime = unlnockTreasury;
-           }
-
-           if (item.Group === 'Team') {
-               firstUnlockTime = unlnockTeam
-           }
-
-            params = {wallet, amount, numberOfPeriods,firstUnlockTime,periodDuration}
-
-           let r = `${wallet +' ' + amount.toString()
-                + '  ' + numberOfPeriods  + '  ' +   firstUnlockTime  + '  ' + periodDuration }`
-                // console.log('✔' ,r)
-            //     console.log( "\x1b[1m","parsed:","✔",r)
-             console.log(params)
-            return params
-
-        }
-        )
+    return [
+        [
+            "Wallet",
+            "Mew Lock Wallet"
+        ],
+        ...newWallet.map(item => [
+            item.wallet,
+            item.newWallet
+        ])
+    ]
+        .map(e => e.join(","))
+        .join("\n")
 }
 
+fs.writeFileSync("ss.CSV",convertToCSV());

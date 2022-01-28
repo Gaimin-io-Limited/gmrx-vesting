@@ -2,6 +2,7 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const hre = require("hardhat");
 const results = [];
+const newWallet = []
 let list;
 
 
@@ -15,11 +16,22 @@ async function main() {
 
 
         for (const item of list) {
-            let firstUnlockTime = Math.floor(new Date().getTime() / 1000) + 3 * 60;
-         await token.approve(factoryAddress, item.amount);
-         console.log("approved");
-         let result = await contract.newTimeLockedWallet(item.wallet.toString(), item.amount, item.numberOfPeriods, firstUnlockTime, 1 * 60);
-         console.log("done: ", result);
+            const txAppr = await token.approve(factoryAddress, item.amount);
+            const receiptAppr = await txAppr.wait();
+            console.log("approved");
+            let result = await contract.newTimeLockedWallet(item.wallet, item.amount, item.numberOfPeriods, item.firstUnlockTime, item.periodDuration);
+            console.log("done: ", result);
+            const receiptNewTWL = await result.wait();
+            // console.log("receiptNewTWL: ", receiptNewTWL);
+            for (let event of receiptNewTWL.events) {
+                if (event.event === 'Created') {
+                    let tlw
+                    tlw = {...item,newWallet:event.args[0]}
+                    newWallet.push(tlw)
+                    fs.writeFileSync("NewTimeLock.CSV",convertToCSV())
+                }
+            }
+
      }
 
 }
@@ -92,6 +104,23 @@ function locker(){
 
 }
 
+function convertToCSV() {
+
+    return [
+        [
+            "Wallet",
+            "New Lock Wallet"
+        ],
+        ...newWallet.map(item => [
+            item.wallet,
+            item.newWallet
+        ])
+    ]
+        .map(e => e.join(","))
+        .join("\n")
+}
+
+
 
 main()
     .then(() => process.exit(0))
@@ -99,9 +128,6 @@ main()
         console.error(error);
         process.exit(1);
     });
-
-
-
 
   fs.createReadStream(__dirname+'/username.csv')
         .pipe(csv())
