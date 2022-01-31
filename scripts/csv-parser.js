@@ -27,9 +27,7 @@ const newWallet = [
     }
 ]
 
-
 function convertToCSV() {
-
     return [
         [
             "Wallet",
@@ -44,4 +42,4 @@ function convertToCSV() {
         .join("\n")
 }
 
-fs.writeFileSync("ss.CSV",convertToCSV());
+fs.writeFileSync("ss.csv", convertToCSV());
