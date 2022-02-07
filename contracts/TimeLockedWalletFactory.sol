@@ -53,8 +53,7 @@ contract TimeLockedWalletFactory is Ownable {
         require(amount > 0, "Amount should be at least 1");
         require(numberOfPeriods > 0, "There should be at least 1 unlock time");
         require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
-        //set 1 days for prod
-        require(periodDuration >= 1 minutes, "Duration between periods should be at least 1 day");
+        require(periodDuration >= 1 minutes, "Duration between periods should be at least 1 minute");
     }
 
     event Created(address wallet, address from, address to, uint amount, uint unlockTime);
