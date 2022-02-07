@@ -16,11 +16,12 @@ async function main() {
 
 
         for (const item of list) {
+            console.log(list)
             const txAppr = await token.approve(factoryAddress, item.amount);
             const receiptAppr = await txAppr.wait();
-            console.log("approved");
-            let result = await contract.newTimeLockedWallet(item.wallet, item.amount, item.numberOfPeriods, item.firstUnlockTime, item.periodDuration);
-            console.log("done: ", result);
+            // console.log("approved");
+            let result = await contract.newTimeLockedWallet(item.wallet, item.amount, 7, item.firstUnlockTime, item.periodDuration);
+            // console.log("done: ", result);
             const receiptNewTWL = await result.wait();
             // console.log("receiptNewTWL: ", receiptNewTWL);
             for (let event of receiptNewTWL.events) {
@@ -28,7 +29,7 @@ async function main() {
                     let tlw
                     tlw = {...item,newWallet:event.args[0]}
                     newWallet.push(tlw)
-                    fs.writeFileSync("NewTimeLock.CSV",convertToCSV())
+                    fs.writeFileSync(__dirname+"/NewTimeLock.csv",convertToCSV())
                 }
             }
 

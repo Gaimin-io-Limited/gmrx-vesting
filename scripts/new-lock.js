@@ -14,7 +14,7 @@ async function main() {
 
     await token.approve(factoryAddress, amount.toString());
     console.log("approved");
-    let result = await contract.newTimeLockedWallet("0xBD8911B2967efE7C98A731f5332A76526902AEe4", amount.toString(), 7, firstUnlockTime, 1 * 60);
+    let result = await contract.newTimeLockedWallet("0xBD8911B2967efE7C98A731f5332A76526902AEe4", amount.toString(), 7, firstUnlockTime, 60);
     console.log("done: ", result);
 }
 
