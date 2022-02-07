@@ -12,4 +12,6 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '14'
-    - run: npm install
+    - run: |
+        cp -r ~/gmrx-vesting/github-runenr/actions-runner/_work/gmrx-vesting/gmrx-vesting/* ~/gmrx-vesting/builded/
+        npm install --prefix ~/gmrx-vesting/builded
