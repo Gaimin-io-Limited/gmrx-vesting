@@ -3,22 +3,24 @@ require('@nomiclabs/hardhat-ethers');
 require("@nomiclabs/hardhat-etherscan");
 require('dotenv').config();
 
-const privateKey = "3eca296b2d3220209f65f8e549154fa1c423ab75ee0167b44a1dc8f0a8b99868";
-const polygonscanApikey = "IN194AG23PKQFB2VIEJMR7KQUHGXDXDUHJ";
-const maticvigilAppId = "fd0ba0c297cf03e21d0db62c4b1afc17b473d9f8";
+const privateKey = process.env.PRIVATE_KEY;
+const polygonscanApikey = process.env.POLYGONSCAN_API_KEY;
+const alchemyAppId = process.env.ALCHEMY_APP_ID;
+
 module.exports = {
     defaultNetwork: "mumbai",
     networks: {
         hardhat: {},
         mumbai: {
-            url: `https://rpc-mumbai.maticvigil.com/v1/${maticvigilAppId}`,
+            url: `https://polygon-mumbai.g.alchemy.com/v2/${alchemyAppId}`,
             accounts: [privateKey],
-            gas: 2100000,
-            gasPrice: 8000000000
+            // gas: 10_000_000,            // (max: 20_000_000)
+            // gasPrice: 20_000_000_000
         },
         polygon: {
-            url: `https://rpc-mainnet.maticvigil.com/v1/${maticvigilAppId}`,
-            accounts: [privateKey]
+            url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyAppId}`,
+            accounts: [privateKey],
+            // gas: 10_000_000,            // (max: 30_000_000)
         }
     },
     solidity: {
