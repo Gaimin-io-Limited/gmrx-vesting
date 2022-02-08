@@ -5,20 +5,22 @@ require('dotenv').config();
 
 const privateKey = process.env.PRIVATE_KEY;
 const polygonscanApikey = process.env.POLYGONSCAN_API_KEY;
-const maticvigilAppId = process.env.MATICVIGIL_APP_ID;
+const alchemyAppId = process.env.ALCHEMY_APP_ID;
+
 module.exports = {
     defaultNetwork: "mumbai",
     networks: {
         hardhat: {},
         mumbai: {
-            url: `https://rpc-mumbai.maticvigil.com/v1/${maticvigilAppId}`,
+            url: `https://polygon-mumbai.g.alchemy.com/v2/${alchemyAppId}`,
             accounts: [privateKey],
-            gas: 2100000,
-            gasPrice: 8000000000
+            // gas: 10_000_000,            // (max: 20_000_000)
+            // gasPrice: 20_000_000_000
         },
         polygon: {
-            url: `https://rpc-mainnet.maticvigil.com/v1/${maticvigilAppId}`,
-            accounts: [privateKey]
+            url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyAppId}`,
+            accounts: [privateKey],
+            // gas: 10_000_000,            // (max: 30_000_000)
         }
     },
     solidity: {
