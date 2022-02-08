@@ -14,27 +14,27 @@ async function main() {
     const contract = contractFactory.attach(factoryAddress);
 
 
-        for (const item of list) {
-            console.log(list)
-            const txAppr = await token.approve(factoryAddress, item.amount);
-            const receiptAppr = await txAppr.wait();
-            // console.log("approved");
-            let result = await contract.newTimeLockedWallet(item.wallet, item.amount, 7, item.firstUnlockTime, item.periodDuration);
-            // console.log("done: ", result);
-            const receiptNewTWL = await result.wait();
-            // console.log("receiptNewTWL: ", receiptNewTWL);
-            for (let event of receiptNewTWL.events) {
-                if (event.event === 'Created') {
-                    let tlw
-                    tlw = {...item,newWallet:event.args[0]}
-                    newWallet.push(tlw)
-                    fs.writeFileSync(__dirname+"/NewTimeLock.csv",convertToCSV())
-                }
+    for (const item of list) {
+        console.log(list)
+        const txAppr = await token.approve(factoryAddress, item.amount);
+        const receiptAppr = await txAppr.wait();
+        // console.log("approved");
+        let result = await contract.newTimeLockedWallet(item.wallet, item.amount, item.numberOfPeriods, item.firstUnlockTime, item.periodDuration);
+        // console.log("done: ", result);
+        const receiptNewTWL = await result.wait();
+        // console.log("receiptNewTWL: ", receiptNewTWL);
+        for (let event of receiptNewTWL.events) {
+            if (event.event === 'Created') {
+                let tlw
+                tlw = {...item, newWallet: event.args[0]}
+                newWallet.push(tlw)
+                fs.writeFileSync(__dirname + "/NewTimeLock.csv", convertToCSV())
             }
         }
     }
+}
 
-function locker() {
+function parserData() {
     const startSalaryTime = Math.floor(new Date().getTime() / 1000)
     const amountMultiplier = '000000000000000000';
     const unlockEquity = startSalaryTime + (2678400 * 6); //2592000 30 day
@@ -114,17 +114,25 @@ function convertToCSV() {
         .join("\n")
 }
 
+async function readData() {
+    fs.createReadStream(__dirname + '/data.csv')
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => {
+            parserData()
+        });
+}
 
-main()
+
+readData()
+    .then(() => main())
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
         process.exit(1);
     });
 
-fs.createReadStream(__dirname + '/username.csv')
-    .pipe(csv())
-    .on('data', (data) => results.push(data))
-    .on('end', () => {
-        locker()
-    });
+
+
+
+

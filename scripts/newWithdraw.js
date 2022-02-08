@@ -11,25 +11,25 @@ async function main() {
         const contract = await contractFactory.attach(item);
         console.log(item)
         console.log("withdraw: ", await contract.withdraw());
+        console.log("lockedAmount: ", (await contract.lockedAmount()).toString());
+        console.log("readyToWithdraw: ", (await contract.readyToWithdraw()).toString());
     }
-    // console.log("lockedAmount: ", (await contract.lockedAmount()).toString());
-    // console.log("readyToWithdraw: ", (await contract.readyToWithdraw()).toString());
-    // console.log("withdraw: ", await contract.withdraw());
-
-
-
 }
 
-main()
+async function parseData(){
+    fs.createReadStream(__dirname+'/NewTimeLock.csv')
+        .pipe(csv())
+        .on('data', (data) => wallets.push(data))
+        .on('end', () => {
+            wallet = wallets.map(e=>e['New Lock Wallet'])
+        });
+}
+
+
+parseData()
+    .then(() => main())
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
         process.exit(1);
-    });
-
-fs.createReadStream(__dirname+'/NewTimeLock.csv')
-    .pipe(csv())
-    .on('data', (data) => wallets.push(data))
-    .on('end', () => {
-        wallet = wallets.map(e=>e['New Lock Wallet'])
     });
