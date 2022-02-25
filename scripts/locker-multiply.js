@@ -15,14 +15,13 @@ async function main() {
 
 
     for (const item of list) {
-        console.log(list)
         const txAppr = await token.approve(factoryAddress, item.amount);
         const receiptAppr = await txAppr.wait();
-        // console.log("approved");
+        console.log("approved");
         let result = await contract.newTimeLockedWallet(item.wallet, item.amount, item.numberOfPeriods, item.firstUnlockTime, item.periodDuration);
-        // console.log("done: ", result);
+        console.log("done: ", result);
         const receiptNewTWL = await result.wait();
-        // console.log("receiptNewTWL: ", receiptNewTWL);
+        console.log("receiptNewTWL: ", receiptNewTWL);
         for (let event of receiptNewTWL.events) {
             if (event.event === 'Created') {
                 let tlw
@@ -48,6 +47,7 @@ function parserData() {
     const unlockDev = startSalaryTime + (2678400 * 6);
     const unlockTreasury = startSalaryTime + 2678400;
     const unlockTeam = startSalaryTime + (2678400 * 12);
+    const unlockAdditional = startSalaryTime + 2678400;
     const periodDuration = 86400;
 
     let amount;
@@ -58,41 +58,55 @@ function parserData() {
     list = results.map((item) => {
         amount = item.Amount + amountMultiplier;
         wallet = item.Wallet;
-        numberOfPeriods = item.Period * 30;
 
         switch (item.Group) {
             case 'Equity':
                 firstUnlockTime = unlockEquity;
+                numberOfPeriods = 60*30
                 break
             case 'Seed' :
                 firstUnlockTime = unlockSeed;
+                numberOfPeriods = 24*30
                 break
             case 'Strategic' :
                 firstUnlockTime = unlockStrategic;
+                numberOfPeriods = 18*30
                 break
             case  'Private' :
                 firstUnlockTime = unlockPrivate
+                numberOfPeriods = 12*30
                 break
             case 'Public' :
                 firstUnlockTime = unlockPublic;
+                numberOfPeriods = 6*30
                 break
             case 'Corporate' :
                 firstUnlockTime = unlockCorporate;
+                numberOfPeriods = 24*30
                 break
             case 'NFT':
                 firstUnlockTime = unlockNftGD;
+                numberOfPeriods = 12*30
+                break
+            case 'Additional':
+                firstUnlockTime = unlockAdditional;
+                numberOfPeriods = 48*30
                 break
             case  'Community' :
                 firstUnlockTime = unlockCommunity;
+                numberOfPeriods = 12*30
                 break
             case 'Development' :
                 firstUnlockTime = unlockDev;
+                numberOfPeriods = 48*30
                 break
             case 'Treasury' :
                 firstUnlockTime = unlockTreasury;
+                numberOfPeriods = 48*30
                 break
             case 'Team' :
                 firstUnlockTime = unlockTeam
+                numberOfPeriods = 60*30
                 break
         }
         return {wallet, amount, numberOfPeriods, firstUnlockTime, periodDuration}
