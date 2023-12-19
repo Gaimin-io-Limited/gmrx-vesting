@@ -1,6 +1,5 @@
-require("@nomiclabs/hardhat-waffle");
 require('@nomiclabs/hardhat-ethers');
-require("@nomiclabs/hardhat-etherscan");
+require("@nomicfoundation/hardhat-verify");
 require('dotenv').config();
 
 const privateKey = process.env.PRIVATE_KEY;
@@ -33,7 +32,7 @@ module.exports = {
         },
     },
     solidity: {
-        version: "0.8.18",
+        version: "0.8.20",
         settings: {
             optimizer: {
                 enabled: false,

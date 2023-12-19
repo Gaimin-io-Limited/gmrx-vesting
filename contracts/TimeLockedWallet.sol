@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 contract TimeLockedWallet is Initializable {
 
@@ -20,7 +20,7 @@ contract TimeLockedWallet is Initializable {
 
     function initialize(address owner, address tokenAddress, uint amount,
         uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public initializer {
-        _validateInitialize(owner, tokenAddress, amount, numberOfPeriods, firstUnlockTime);
+        _validateInitialize(tokenAddress, amount, numberOfPeriods, firstUnlockTime);
         _owner = owner;
         _tokenAddress = tokenAddress;
         uint periodAmount = amount / numberOfPeriods;
@@ -69,9 +69,7 @@ contract TimeLockedWallet is Initializable {
         revert("Nothing to withdraw");
     }
 
-    function _validateInitialize(address owner, address tokenAddress, uint amount,
-        uint numberOfPeriods, uint firstUnlockTime) private view {
-        require(!Address.isContract(owner), "Owner should be externally-owned account and not a contract");
+    function _validateInitialize(address tokenAddress, uint amount, uint numberOfPeriods, uint firstUnlockTime) private view {
         require(ERC20(tokenAddress).balanceOf(address(this)) == amount, "Amount of tokens should already be transferred to this locked contract");
         require(numberOfPeriods > 0, "There should be at least 1 unlock time");
         require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");

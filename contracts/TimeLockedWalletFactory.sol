@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
-import "./TimeLockedWallet.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/proxy/Clones.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import {ERC20, TimeLockedWallet} from "./TimeLockedWallet.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract TimeLockedWalletFactory is Ownable {
 
@@ -13,7 +12,7 @@ contract TimeLockedWalletFactory is Ownable {
     address public _tokenAddress;
     address public _tlwAddress;
 
-    constructor(address tokenAddress, address tlwAddress) {
+    constructor(address tokenAddress, address tlwAddress) Ownable(msg.sender) {
         setTokenAddress(tokenAddress);
         setTLWAddress(tlwAddress);
     }
@@ -32,7 +31,7 @@ contract TimeLockedWalletFactory is Ownable {
 
     function newTimeLockedWallet(address owner, uint amount,
         uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public returns (address wallet) {
-        _validateNewTimeLockedWallet(owner, amount, numberOfPeriods, firstUnlockTime, periodDuration);
+        _validateNewTimeLockedWallet(amount, numberOfPeriods, firstUnlockTime, periodDuration);
         ERC20 token = ERC20(_tokenAddress);
         require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
 
@@ -47,9 +46,7 @@ contract TimeLockedWalletFactory is Ownable {
         emit Created(wallet, msg.sender, owner, amount, firstUnlockTime);
     }
 
-    function _validateNewTimeLockedWallet(address owner, uint amount,
-        uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) private view {
-        require(!Address.isContract(owner), "Owner should be externally-owned account and not a contract");
+    function _validateNewTimeLockedWallet(uint amount, uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) private view {
         require(amount > 0, "Amount should be at least 1");
         require(numberOfPeriods > 0, "There should be at least 1 unlock time");
         require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
