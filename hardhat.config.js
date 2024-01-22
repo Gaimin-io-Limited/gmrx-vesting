@@ -9,8 +9,9 @@ const alchemyAppId = process.env.ALCHEMY_APP_ID;
 const noderealapikey = process.env.NODEREAL_API_KEY;
 
 module.exports = {
-    defaultNetwork: "localhost",
+    defaultNetwork: "hardhat",
     networks: {
+        hardhat:{},
         polygon: {
             url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyAppId}`,
             accounts: [privateKey],

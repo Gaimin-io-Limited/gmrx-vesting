@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.23;
 
 import {ERC20, TimeLockedWallet} from "./TimeLockedWallet.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -30,29 +30,29 @@ contract TimeLockedWalletFactory is Ownable {
     }
 
     function newTimeLockedWallet(address owner, uint amount,
-        uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public returns (address wallet) {
-        _validateNewTimeLockedWallet(amount, numberOfPeriods, firstUnlockTime, periodDuration);
+        uint cliffDuration, uint fullDuration, uint initTimestamp) public returns (address wallet) {
+        _validateNewTimeLockedWallet(owner, amount, cliffDuration, fullDuration);
         ERC20 token = ERC20(_tokenAddress);
         require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
 
         wallet = Clones.clone(_tlwAddress);
         require(token.transferFrom(msg.sender, wallet, amount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, amount, numberOfPeriods, firstUnlockTime, periodDuration);
+        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, amount, cliffDuration, fullDuration, initTimestamp);
 
         wallets[msg.sender].push(wallet);
         if (msg.sender != owner) {
             wallets[owner].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, amount, firstUnlockTime);
+        emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration);
     }
 
-    function _validateNewTimeLockedWallet(uint amount, uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) private view {
+    function _validateNewTimeLockedWallet(address owner, uint amount,
+        uint cliffDuration, uint fullDuration) private view {
         require(amount > 0, "Amount should be at least 1");
-        require(numberOfPeriods > 0, "There should be at least 1 unlock time");
-        require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
-        require(periodDuration >= 1 minutes, "Duration between periods should be at least 1 minute");
+        require(cliffDuration > 0, "First unlock time should be in the future");
+        require(fullDuration > 0, "Unlock time should be in the future");
     }
 
-    event Created(address wallet, address from, address to, uint amount, uint unlockTime);
+    event Created(address wallet, address from, address to, uint amount, uint cliffDuration, uint fullDuration);
 
 }
