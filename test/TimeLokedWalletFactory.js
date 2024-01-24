@@ -55,7 +55,8 @@ describe("TimeLockedWalletFactory", function () {
         const wallet = TimeLockedWallet.attach(walletAddress);
 
         expect(await wallet._owner()).to.equal(tlwOwner.address);
-        expect(await wallet._amount()).to.equal(amount);
+        expect(await wallet._totalAmount()).to.equal(amount);
+        expect(await wallet._lockedAmount()).to.equal(amount);
         expect(await wallet._cliffDuration()).to.equal(cliffDuration);
         expect(await wallet._fullDuration()).to.equal(fullDuration);
         expect(await wallet._initTimestamp()).to.equal(initTimestamp);
@@ -63,7 +64,7 @@ describe("TimeLockedWalletFactory", function () {
 
     it("fails to create a new time locked wallet with zero amount", async function () {
         await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 0, cliffDuration, fullDuration, initTimestamp))
-            .to.be.revertedWith("Amount should be at least 1");
+            .to.be.revertedWith("Amount must be greater than zero");
     });
 
     it("fails to create a new time locked wallet with zero cliff duration", async function () {

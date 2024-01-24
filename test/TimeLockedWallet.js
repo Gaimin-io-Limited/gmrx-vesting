@@ -37,9 +37,11 @@ describe('TimeLockedWallet', function () {
         it('should initialize with correct values', async function () {
             expect(await timeLockedWallet._owner()).to.equal(owner.address);
             expect(await timeLockedWallet._tokenAddress()).to.equal(token.address);
-            expect((await timeLockedWallet._amount()).toString()).to.equal(amount.toString());
+            expect((await timeLockedWallet._totalAmount()).toString()).to.equal(amount.toString());
+            expect((await timeLockedWallet._lockedAmount()).toString()).to.equal(amount.toString());
             expect((await timeLockedWallet._cliffDuration()).toNumber()).to.equal(cliffDuration);
             expect((await timeLockedWallet._fullDuration()).toNumber()).to.equal(fullDuration);
+            expect((await timeLockedWallet._initTimestamp()).toNumber()).to.equal(initTimestamp);
         });
     });
 
@@ -90,12 +92,12 @@ describe('TimeLockedWallet', function () {
 
         it('should withdraw part after cliff duration and remaining after full duration',
             async function () {
-                const lastWithdrawal = await timeLockedWallet._lastWithdrawalTimestamp();
+                const lastWithdrawal = await timeLockedWallet._lastClaimedTimestamp();
                 expect((await token.balanceOf(owner.address)).toString()).to.equal('0');
 
                 await time.increaseTo(cliffTimestamp())
                 await timeLockedWallet.withdraw();
-                const timePassed = (await timeLockedWallet._lastWithdrawalTimestamp()) - lastWithdrawal;
+                const timePassed = (await timeLockedWallet._lastClaimedTimestamp()) - lastWithdrawal;
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
                     .mul(hre.ethers.BigNumber.from(timePassed)).toString();
                 expect((await token.balanceOf(owner.address)).toString()).to.equal(amountToBeWithdrawed);

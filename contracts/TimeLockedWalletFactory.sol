@@ -17,20 +17,23 @@ contract TimeLockedWalletFactory is Ownable {
         setTLWAddress(tlwAddress);
     }
 
-    function getWallets(address user) public view onlyOwner returns (address[] memory) {
+    function getWallets(address user)
+    public view onlyOwner returns (address[] memory) {
         return wallets[user];
     }
 
-    function setTokenAddress(address tokenAddress) public onlyOwner {
+    function setTokenAddress(address tokenAddress)
+    public onlyOwner {
         _tokenAddress = tokenAddress;
     }
 
-    function setTLWAddress(address tlwAddress) public onlyOwner {
+    function setTLWAddress(address tlwAddress)
+    public onlyOwner {
         _tlwAddress = tlwAddress;
     }
 
-    function newTimeLockedWallet(address owner, uint amount,
-        uint cliffDuration, uint fullDuration, uint initTimestamp) public returns (address wallet) {
+    function newTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    public returns (address wallet) {
         _validateNewTimeLockedWallet(owner, amount, cliffDuration, fullDuration);
         ERC20 token = ERC20(_tokenAddress);
         require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
@@ -46,9 +49,10 @@ contract TimeLockedWalletFactory is Ownable {
         emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration);
     }
 
-    function _validateNewTimeLockedWallet(address owner, uint amount,
-        uint cliffDuration, uint fullDuration) private view {
-        require(amount > 0, "Amount should be at least 1");
+    function _validateNewTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration)
+    private pure {
+        require(owner != address(0), "Owner address is invalid");
+        require(amount > 0, "Amount must be greater than zero");
         require(cliffDuration > 0, "First unlock time should be in the future");
         require(fullDuration > 0, "Unlock time should be in the future");
     }
