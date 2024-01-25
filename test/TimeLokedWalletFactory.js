@@ -38,7 +38,7 @@ describe("TimeLockedWalletFactory", function () {
 
         await expect(newTimeLockedWalletTx)
             .to.emit(timeLockedWalletFactory, 'Created')
-            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, amount, cliffDuration, fullDuration);
+            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, amount, cliffDuration, fullDuration, initTimestamp);
     });
 
     it("creates a new time locked wallet using clone method", async function () {
@@ -65,17 +65,6 @@ describe("TimeLockedWalletFactory", function () {
     it("fails to create a new time locked wallet with zero amount", async function () {
         await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 0, cliffDuration, fullDuration, initTimestamp))
             .to.be.revertedWith("Amount must be greater than zero");
-    });
-
-    it("fails to create a new time locked wallet with zero cliff duration", async function () {
-        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, amount, 0, fullDuration, initTimestamp))
-            .to.be.revertedWith("First unlock time should be in the future");
-
-    });
-
-    it("fails to create a new time locked wallet with zero full duration", async function () {
-        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, amount, cliffDuration, 0, initTimestamp))
-            .to.be.revertedWith("Unlock time should be in the future");
     });
 
     it("sets the token address", async function () {

@@ -34,7 +34,7 @@ contract TimeLockedWalletFactory is Ownable {
 
     function newTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp)
     public returns (address wallet) {
-        _validateNewTimeLockedWallet(owner, amount, cliffDuration, fullDuration);
+        _validateNewTimeLockedWallet(owner, amount);
         ERC20 token = ERC20(_tokenAddress);
         require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
 
@@ -46,17 +46,15 @@ contract TimeLockedWalletFactory is Ownable {
         if (msg.sender != owner) {
             wallets[owner].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration);
+        emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration, initTimestamp);
     }
 
-    function _validateNewTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration)
+    function _validateNewTimeLockedWallet(address owner, uint amount)
     private pure {
         require(owner != address(0), "Owner address is invalid");
         require(amount > 0, "Amount must be greater than zero");
-        require(cliffDuration > 0, "First unlock time should be in the future");
-        require(fullDuration > 0, "Unlock time should be in the future");
     }
 
-    event Created(address wallet, address from, address to, uint amount, uint cliffDuration, uint fullDuration);
+    event Created(address wallet, address from, address to, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp);
 
 }
