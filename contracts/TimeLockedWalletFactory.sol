@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.23;
 
 import {ERC20, TimeLockedWallet} from "./TimeLockedWallet.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,42 +17,44 @@ contract TimeLockedWalletFactory is Ownable {
         setTLWAddress(tlwAddress);
     }
 
-    function getWallets(address user) public view onlyOwner returns (address[] memory) {
+    function getWallets(address user)
+    public view onlyOwner returns (address[] memory) {
         return wallets[user];
     }
 
-    function setTokenAddress(address tokenAddress) public onlyOwner {
+    function setTokenAddress(address tokenAddress)
+    public onlyOwner {
         _tokenAddress = tokenAddress;
     }
 
-    function setTLWAddress(address tlwAddress) public onlyOwner {
+    function setTLWAddress(address tlwAddress)
+    public onlyOwner {
         _tlwAddress = tlwAddress;
     }
 
-    function newTimeLockedWallet(address owner, uint amount,
-        uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public returns (address wallet) {
-        _validateNewTimeLockedWallet(amount, numberOfPeriods, firstUnlockTime, periodDuration);
+    function newTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    public returns (address wallet) {
+        _validateNewTimeLockedWallet(owner, amount);
         ERC20 token = ERC20(_tokenAddress);
         require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
 
         wallet = Clones.clone(_tlwAddress);
         require(token.transferFrom(msg.sender, wallet, amount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, amount, numberOfPeriods, firstUnlockTime, periodDuration);
+        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, amount, cliffDuration, fullDuration, initTimestamp);
 
         wallets[msg.sender].push(wallet);
         if (msg.sender != owner) {
             wallets[owner].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, amount, firstUnlockTime);
+        emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration, initTimestamp);
     }
 
-    function _validateNewTimeLockedWallet(uint amount, uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) private view {
-        require(amount > 0, "Amount should be at least 1");
-        require(numberOfPeriods > 0, "There should be at least 1 unlock time");
-        require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
-        require(periodDuration >= 1 minutes, "Duration between periods should be at least 1 minute");
+    function _validateNewTimeLockedWallet(address owner, uint amount)
+    private pure {
+        require(owner != address(0), "Owner address is invalid");
+        require(amount > 0, "Amount must be greater than zero");
     }
 
-    event Created(address wallet, address from, address to, uint amount, uint unlockTime);
+    event Created(address wallet, address from, address to, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp);
 
 }

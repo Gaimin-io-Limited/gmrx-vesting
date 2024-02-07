@@ -7,8 +7,9 @@ const bscscanApikey = process.env.BSCSCAN_API_KEY;
 const noderealApiKey = process.env.NODEREAL_API_KEY;
 
 module.exports = {
-    defaultNetwork: "localhost",
+    defaultNetwork: "hardhat",
     networks: {
+        hardhat: {},
         bnb_chain: {
             url: `https://bsc-mainnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],

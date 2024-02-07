@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.20;
+pragma solidity 0.8.23;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -8,71 +7,68 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 
 contract TimeLockedWallet is Initializable {
 
-    struct LockBoxStruct {
-        uint amount;
-        uint unlockTime;
-        bool paid;
-    }
-
     address public _owner;
     address public _tokenAddress;
-    LockBoxStruct[] public _lockBoxes;
+    uint public _totalAmount;
+    uint public _lockedAmount;
+    uint public _cliffDuration;
+    uint public _fullDuration;
+    uint public _initTimestamp;
+    uint public _lastClaimedTimestamp;
 
-    function initialize(address owner, address tokenAddress, uint amount,
-        uint numberOfPeriods, uint firstUnlockTime, uint periodDuration) public initializer {
-        _validateInitialize(tokenAddress, amount, numberOfPeriods, firstUnlockTime);
+    function initialize(address owner, address tokenAddress, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    public initializer {
+        _validateInitialize(owner, tokenAddress, amount);
         _owner = owner;
         _tokenAddress = tokenAddress;
-        uint periodAmount = amount / numberOfPeriods;
-        for (uint i = 0; i < numberOfPeriods; i++) {
-            LockBoxStruct memory box;
-            box.amount = periodAmount;
-            box.unlockTime = firstUnlockTime + i * periodDuration;
-            box.paid = false;
-            _lockBoxes.push(box);
-        }
-        LockBoxStruct storage lastBox = _lockBoxes[numberOfPeriods - 1];
-        lastBox.amount = lastBox.amount + amount % numberOfPeriods;
+        _totalAmount = amount;
+        _lockedAmount = amount;
+        _cliffDuration = cliffDuration;
+        _fullDuration = fullDuration;
+        _initTimestamp = initTimestamp;
+        _lastClaimedTimestamp = initTimestamp;
     }
 
-    function lockedAmount() public view returns (uint amount) {
-        for (uint i = 0; i < _lockBoxes.length; i++) {
-            LockBoxStruct memory box = _lockBoxes[i];
-            if (box.paid == false) {
-                amount = amount + box.amount;
-            }
+    function readyToWithdraw()
+    public view returns (uint amount) {
+        uint currentTimestamp = block.timestamp;
+
+        if (currentTimestamp < _initTimestamp + _cliffDuration) {
+            return 0;
         }
-        return amount;
+        if (currentTimestamp >= _initTimestamp + _fullDuration) {
+            return lockedAmount();
+        }
+
+        uint vestingRate = _totalAmount / _fullDuration;
+
+        uint timePassed = currentTimestamp - _lastClaimedTimestamp;
+        return vestingRate * timePassed;
     }
 
-    function readyToWithdraw() public view returns (uint amount) {
-        for (uint i = 0; i < _lockBoxes.length; i++) {
-            LockBoxStruct memory box = _lockBoxes[i];
-            if (box.unlockTime <= block.timestamp && box.paid == false) {
-                amount = amount + box.amount;
-            }
+    function withdraw()
+    public {
+        uint withdrawAmount = readyToWithdraw();
+        if (withdrawAmount == 0) {
+            revert("Nothing to withdraw");
         }
-        return amount;
+
+        _lastClaimedTimestamp = block.timestamp;
+
+        ERC20 token = ERC20(_tokenAddress);
+        SafeERC20.safeTransfer(token, _owner, withdrawAmount);
+        emit Withdrawal(withdrawAmount);
     }
 
-    function withdraw() public {
-        for (uint i = 0; i < _lockBoxes.length; i++) {
-            LockBoxStruct storage box = _lockBoxes[i];
-            if (box.unlockTime <= block.timestamp && box.paid == false) {
-                box.paid = true;
-                ERC20 token = ERC20(_tokenAddress);
-                SafeERC20.safeTransfer(token, _owner, box.amount);
-                emit Withdrawal(box.amount);
-                return;
-            }
-        }
-        revert("Nothing to withdraw");
+    function lockedAmount() public view returns (uint lockedAmount) {
+        return ERC20(_tokenAddress).balanceOf(address(this));
     }
 
-    function _validateInitialize(address tokenAddress, uint amount, uint numberOfPeriods, uint firstUnlockTime) private view {
+    function _validateInitialize(address owner, address tokenAddress, uint amount)
+    private view {
+        require(owner != address(0), "Owner address is invalid");
+        require(amount > 0, "Amount must be greater than zero");
         require(ERC20(tokenAddress).balanceOf(address(this)) == amount, "Amount of tokens should already be transferred to this locked contract");
-        require(numberOfPeriods > 0, "There should be at least 1 unlock time");
-        require(firstUnlockTime > block.timestamp, "Unlock time should be in the future");
     }
 
     event Withdrawal(uint amount);

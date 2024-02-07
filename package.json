@@ -4,13 +4,17 @@
   "description": "Vesting smart contract to distribute GMRX tokens",
   "main": "hardhat.config.js",
   "dependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@nomicfoundation/hardhat-verify": "^2.0.3",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@openzeppelin/contracts": "v5.0.1",
     "dotenv": "^16.3.1",
     "hardhat": "^2.19.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
+    "chai": "^5.0.0",
+    "ethereum-waffle": "^4.0.10"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
