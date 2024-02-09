@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
+    "mocha": "^10.2.0",
     "chai": "^5.0.0",
     "ethereum-waffle": "^4.0.10"
   },

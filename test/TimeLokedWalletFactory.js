@@ -10,11 +10,14 @@ before(async function () {
 });
 
 describe("TimeLockedWalletFactory", function () {
-    let TimeLockedWalletFactory, TimeLockedWallet, timeLockedWallet, Token, token, timeLockedWalletFactory, tokenOwner,
-        tlwOwner, randomAddress;
-    const amount = hre.ethers.BigNumber.from('10000000000000000000000'); // 10000 GMRX
-    const cliffDuration = 60 * 60 * 24 * 30; // 30 days
-    const fullDuration = 60 * 60 * 24 * 365; // 1 year
+    let TimeLockedWalletFactory, timeLockedWalletFactory, TimeLockedWallet, timeLockedWallet,
+        Token, token, tokenOwner, tlwOwner, randomAddress;
+
+    const TOTAL_AMOUNT = hre.ethers.BigNumber.from('10000000000000000000000'); // 10000 GMRX
+    const FIRST_DAY_AMOUNT = hre.ethers.BigNumber.from('1000000000000000000000'); // 1000 GMRX
+    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(FIRST_DAY_AMOUNT);
+    const CLIFF_DURATION = 60 * 60 * 24 * 30; // 30 days
+    const FULL_DURATION = 60 * 60 * 24 * 365; // 1 year
     let initTimestamp;
 
     beforeEach(async function () {
@@ -28,23 +31,24 @@ describe("TimeLockedWalletFactory", function () {
         token = await Token.connect(tokenOwner).deploy();
 
         timeLockedWalletFactory = await TimeLockedWalletFactory.deploy(token.address, timeLockedWallet.address);
-        token.connect(tokenOwner).approve(timeLockedWalletFactory.address, amount);
+        token.connect(tokenOwner).approve(timeLockedWalletFactory.address, TOTAL_AMOUNT);
     });
 
     it("creates a new time locked wallet and emit event", async function () {
-        const newTimeLockedWalletTx = await timeLockedWalletFactory.connect(tokenOwner).newTimeLockedWallet(tlwOwner.address, amount, cliffDuration, fullDuration, initTimestamp);
+        const newTimeLockedWalletTx = await timeLockedWalletFactory.connect(tokenOwner)
+            .newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
         const receipt = await newTimeLockedWalletTx.wait();
         const walletAddress = receipt.events?.find(e => e.event === 'Created').args.wallet;
 
         await expect(newTimeLockedWalletTx)
             .to.emit(timeLockedWalletFactory, 'Created')
-            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, amount, cliffDuration, fullDuration, initTimestamp);
+            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
     });
 
     it("creates a new time locked wallet using clone method", async function () {
         const initialWalletsCount = (await timeLockedWalletFactory.getWallets(tokenOwner.address)).length;
 
-        const tx = await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, amount, cliffDuration, fullDuration, initTimestamp);
+        const tx = await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
         const receipt = await tx.wait();
         const walletAddress = receipt.events?.find(e => e.event === 'Created').args.wallet;
 
@@ -55,16 +59,22 @@ describe("TimeLockedWalletFactory", function () {
         const wallet = TimeLockedWallet.attach(walletAddress);
 
         expect(await wallet._owner()).to.equal(tlwOwner.address);
-        expect(await wallet._totalAmount()).to.equal(amount);
-        expect(await wallet._lockedAmount()).to.equal(amount);
-        expect(await wallet._cliffDuration()).to.equal(cliffDuration);
-        expect(await wallet._fullDuration()).to.equal(fullDuration);
+        expect(await wallet._totalAmount()).to.equal(TOTAL_AMOUNT);
+        expect(await wallet._firstDayAmount()).to.equal(FIRST_DAY_AMOUNT);
+        expect(await wallet._lockedAmount()).to.equal(LOCKED_AMOUNT);
+        expect(await wallet._cliffDuration()).to.equal(CLIFF_DURATION);
+        expect(await wallet._fullDuration()).to.equal(FULL_DURATION);
         expect(await wallet._initTimestamp()).to.equal(initTimestamp);
     });
 
     it("fails to create a new time locked wallet with zero amount", async function () {
-        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 0, cliffDuration, fullDuration, initTimestamp))
-            .to.be.revertedWith("Amount must be greater than zero");
+        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 0, FIRST_DAY_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp))
+            .to.be.revertedWith("Total amount must be greater than zero");
+    });
+
+    it("fails to create a new time locked wallet with first day amount greater than total amount", async function () {
+        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 10, 100, CLIFF_DURATION, FULL_DURATION, initTimestamp))
+            .to.be.revertedWith("First day amount must not be greater then total amount");
     });
 
     it("sets the token address", async function () {
@@ -78,7 +88,7 @@ describe("TimeLockedWalletFactory", function () {
     });
 
     it("gets the wallets of a user", async function () {
-        await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, amount, cliffDuration, fullDuration, initTimestamp);
+        await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
         const wallets = await timeLockedWalletFactory.getWallets(tlwOwner.address);
         expect(wallets.length).to.equal(1);
     });
