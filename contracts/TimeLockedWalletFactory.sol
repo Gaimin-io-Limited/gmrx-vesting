@@ -9,12 +9,12 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 contract TimeLockedWalletFactory is Ownable {
 
     mapping(address => address[]) wallets;
-    address public _tokenAddress;
-    address public _tlwAddress;
+    address public tokenAddress;
+    address public tlwAddress;
 
-    constructor(address tokenAddress, address tlwAddress) Ownable(msg.sender) {
-        setTokenAddress(tokenAddress);
-        setTLWAddress(tlwAddress);
+    constructor(address tokenAddress_, address tlwAddress_) Ownable(msg.sender) {
+        setTokenAddress(tokenAddress_);
+        setTLWAddress(tlwAddress_);
     }
 
     function getWallets(address user)
@@ -22,26 +22,26 @@ contract TimeLockedWalletFactory is Ownable {
         return wallets[user];
     }
 
-    function setTokenAddress(address tokenAddress)
+    function setTokenAddress(address tokenAddress_)
     public onlyOwner {
-        _tokenAddress = tokenAddress;
+        tokenAddress = tokenAddress_;
     }
 
-    function setTLWAddress(address tlwAddress)
+    function setTLWAddress(address tlwAddress_)
     public onlyOwner {
-        _tlwAddress = tlwAddress;
+        tlwAddress = tlwAddress_;
     }
 
     function newTimeLockedWallet(address owner, uint totalAmount, uint firstDayAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
     public returns (address wallet) {
         _validateNewTimeLockedWallet(owner, totalAmount, firstDayAmount);
 
-        ERC20 token = ERC20(_tokenAddress);
+        ERC20 token = ERC20(tokenAddress);
         require(totalAmount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :totalAmount of tokens");
 
-        wallet = Clones.clone(_tlwAddress);
+        wallet = Clones.clone(tlwAddress);
         require(token.transferFrom(msg.sender, wallet, totalAmount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, totalAmount, firstDayAmount, cliffDuration, fullDuration, initTimestamp);
+        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, firstDayAmount, cliffDuration, fullDuration, initTimestamp);
 
         wallets[msg.sender].push(wallet);
         if (msg.sender != owner) {

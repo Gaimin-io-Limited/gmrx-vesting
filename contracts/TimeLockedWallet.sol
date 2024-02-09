@@ -7,49 +7,49 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 
 contract TimeLockedWallet is Initializable {
 
-    address public _owner;
-    address public _tokenAddress;
+    address public owner;
+    address public tokenAddress;
 
-    uint public _totalAmount;
-    uint public _firstDayAmount;
-    uint public _lockedAmount;
-    uint public _cliffDuration;
-    uint public _fullDuration;
-    uint public _initTimestamp;
-    uint public _lastClaimedTimestamp;
+    uint public totalAmount;
+    uint public firstDayAmount;
+    uint public lockedAmount;
+    uint public cliffDuration;
+    uint public fullDuration;
+    uint public initTimestamp;
+    uint public lastClaimedTimestamp;
 
-    function initialize(address owner, address tokenAddress, uint totalAmount, uint firstDayAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    function initialize(address owner_, address tokenAddress_, uint totalAmount_, uint firstDayAmount_, uint cliffDuration_, uint fullDuration_, uint initTimestamp_)
     public initializer {
-        _validateInitialize(owner, tokenAddress, totalAmount, firstDayAmount);
+        _validateInitialize(owner_, tokenAddress_, totalAmount_, firstDayAmount_);
 
-        _owner = owner;
-        _tokenAddress = tokenAddress;
-        _totalAmount = totalAmount;
-        _firstDayAmount = firstDayAmount;
-        _lockedAmount = totalAmount - firstDayAmount;
-        _cliffDuration = cliffDuration;
-        _fullDuration = fullDuration;
-        _initTimestamp = initTimestamp;
-        _lastClaimedTimestamp = initTimestamp;
+        owner = owner_;
+        tokenAddress = tokenAddress_;
+        totalAmount = totalAmount_;
+        firstDayAmount = firstDayAmount_;
+        lockedAmount = totalAmount_ - firstDayAmount_;
+        cliffDuration = cliffDuration_;
+        fullDuration = fullDuration_;
+        initTimestamp = initTimestamp_;
+        lastClaimedTimestamp = initTimestamp_;
     }
 
     function readyToWithdraw()
     public view returns (uint amount) {
         uint currentTimestamp = block.timestamp;
 
-        bool firstDayAmountWithdrawn = _lastClaimedTimestamp != _initTimestamp;
+        bool firstDayAmountWithdrawn = lastClaimedTimestamp != initTimestamp;
 
-        if (currentTimestamp < _initTimestamp + _cliffDuration) {
-            return firstDayAmountWithdrawn ? 0 : _firstDayAmount;
+        if (currentTimestamp < initTimestamp + cliffDuration) {
+            return firstDayAmountWithdrawn ? 0 : firstDayAmount;
         }
-        if (currentTimestamp >= _initTimestamp + _fullDuration) {
+        if (currentTimestamp >= initTimestamp + fullDuration) {
             return remainingAmount();
         }
 
-        uint vestingRate = _lockedAmount / _fullDuration;
+        uint vestingRate = lockedAmount / fullDuration;
 
-        uint timePassed = currentTimestamp - _lastClaimedTimestamp;
-        return vestingRate * timePassed + (firstDayAmountWithdrawn ? 0 : _firstDayAmount);
+        uint timePassed = currentTimestamp - lastClaimedTimestamp;
+        return vestingRate * timePassed + (firstDayAmountWithdrawn ? 0 : firstDayAmount);
     }
 
     function withdraw()
@@ -59,23 +59,23 @@ contract TimeLockedWallet is Initializable {
             revert("Nothing to withdraw");
         }
 
-        _lastClaimedTimestamp = block.timestamp;
+        lastClaimedTimestamp = block.timestamp;
 
-        ERC20 token = ERC20(_tokenAddress);
-        SafeERC20.safeTransfer(token, _owner, withdrawAmount);
+        ERC20 token = ERC20(tokenAddress);
+        SafeERC20.safeTransfer(token, owner, withdrawAmount);
         emit Withdrawal(withdrawAmount);
     }
 
     function remainingAmount() public view returns (uint amount) {
-        return ERC20(_tokenAddress).balanceOf(address(this));
+        return ERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function _validateInitialize(address owner, address tokenAddress, uint totalAmount, uint firstDayAmount)
+    function _validateInitialize(address owner_, address tokenAddress_, uint totalAmount_, uint firstDayAmount_)
     private view {
-        require(owner != address(0), "Owner address is invalid");
-        require(totalAmount > 0, "Amount must be greater than zero");
-        require(firstDayAmount <= totalAmount, "First day amount must not be greater then total amount");
-        require(ERC20(tokenAddress).balanceOf(address(this)) == totalAmount, "Amount of tokens should already be transferred to this locked contract");
+        require(owner_ != address(0), "Owner address is invalid");
+        require(totalAmount_ > 0, "Amount must be greater than zero");
+        require(firstDayAmount_ <= totalAmount_, "First day amount must not be greater then total amount");
+        require(ERC20(tokenAddress_).balanceOf(address(this)) == totalAmount_, "Amount of tokens should already be transferred to this locked contract");
     }
 
     event Withdrawal(uint amount);

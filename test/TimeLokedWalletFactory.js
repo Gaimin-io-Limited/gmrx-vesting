@@ -58,13 +58,13 @@ describe("TimeLockedWalletFactory", function () {
 
         const wallet = TimeLockedWallet.attach(walletAddress);
 
-        expect(await wallet._owner()).to.equal(tlwOwner.address);
-        expect(await wallet._totalAmount()).to.equal(TOTAL_AMOUNT);
-        expect(await wallet._firstDayAmount()).to.equal(FIRST_DAY_AMOUNT);
-        expect(await wallet._lockedAmount()).to.equal(LOCKED_AMOUNT);
-        expect(await wallet._cliffDuration()).to.equal(CLIFF_DURATION);
-        expect(await wallet._fullDuration()).to.equal(FULL_DURATION);
-        expect(await wallet._initTimestamp()).to.equal(initTimestamp);
+        expect(await wallet.owner()).to.equal(tlwOwner.address);
+        expect(await wallet.totalAmount()).to.equal(TOTAL_AMOUNT);
+        expect(await wallet.firstDayAmount()).to.equal(FIRST_DAY_AMOUNT);
+        expect(await wallet.lockedAmount()).to.equal(LOCKED_AMOUNT);
+        expect(await wallet.cliffDuration()).to.equal(CLIFF_DURATION);
+        expect(await wallet.fullDuration()).to.equal(FULL_DURATION);
+        expect(await wallet.initTimestamp()).to.equal(initTimestamp);
     });
 
     it("fails to create a new time locked wallet with zero amount", async function () {
@@ -79,12 +79,12 @@ describe("TimeLockedWalletFactory", function () {
 
     it("sets the token address", async function () {
         await timeLockedWalletFactory.setTokenAddress(randomAddress.address);
-        expect(await timeLockedWalletFactory._tokenAddress()).to.equal(randomAddress.address);
+        expect(await timeLockedWalletFactory.tokenAddress()).to.equal(randomAddress.address);
     });
 
     it("sets the time locked wallet address", async function () {
         await timeLockedWalletFactory.setTLWAddress(randomAddress.address);
-        expect(await timeLockedWalletFactory._tlwAddress()).to.equal(randomAddress.address);
+        expect(await timeLockedWalletFactory.tlwAddress()).to.equal(randomAddress.address);
     });
 
     it("gets the wallets of a user", async function () {

@@ -41,15 +41,15 @@ describe('TimeLockedWallet', function () {
 
     describe('Initialization', function () {
         it('should initialize with correct values', async function () {
-            expect(await timeLockedWallet._owner()).to.equal(owner.address);
-            expect(await timeLockedWallet._tokenAddress()).to.equal(token.address);
-            expect((await timeLockedWallet._totalAmount()).eq(TOTAL_AMOUNT)).to.be.true;
-            expect((await timeLockedWallet._firstDayAmount()).eq(FIRST_DAY_AMOUNT)).to.be.true;
-            expect((await timeLockedWallet._lockedAmount()).eq(LOCKED_AMOUNT)).to.be.true;
+            expect(await timeLockedWallet.owner()).to.equal(owner.address);
+            expect(await timeLockedWallet.tokenAddress()).to.equal(token.address);
+            expect((await timeLockedWallet.totalAmount()).eq(TOTAL_AMOUNT)).to.be.true;
+            expect((await timeLockedWallet.firstDayAmount()).eq(FIRST_DAY_AMOUNT)).to.be.true;
+            expect((await timeLockedWallet.lockedAmount()).eq(LOCKED_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
-            expect((await timeLockedWallet._cliffDuration()).eq(CLIFF_DURATION)).to.be.true;
-            expect((await timeLockedWallet._fullDuration()).eq(FULL_DURATION)).to.be.true;
-            expect((await timeLockedWallet._initTimestamp()).eq(initTimestamp)).to.be.true;
+            expect((await timeLockedWallet.cliffDuration()).eq(CLIFF_DURATION)).to.be.true;
+            expect((await timeLockedWallet.fullDuration()).eq(FULL_DURATION)).to.be.true;
+            expect((await timeLockedWallet.initTimestamp()).eq(initTimestamp)).to.be.true;
         });
     });
 
@@ -103,12 +103,12 @@ describe('TimeLockedWallet', function () {
 
         it('should withdraw part after cliff duration and remaining after full duration',
             async function () {
-                const lastWithdrawal = await timeLockedWallet._lastClaimedTimestamp();
+                const lastWithdrawal = await timeLockedWallet.lastClaimedTimestamp();
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
                 await time.increaseTo(cliffTimestamp())
                 await timeLockedWallet.withdraw();
-                const timePassed = (await timeLockedWallet._lastClaimedTimestamp()) - lastWithdrawal;
+                const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - lastWithdrawal;
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
                     .mul(hre.ethers.BigNumber.from(timePassed))
                     .add(FIRST_DAY_AMOUNT)
@@ -187,12 +187,12 @@ describe('TimeLockedWallet without first day amount', function () {
 
         it('should withdraw part after cliff duration and remaining after full duration',
             async function () {
-                const lastWithdrawal = await timeLockedWallet._lastClaimedTimestamp();
+                const lastWithdrawal = await timeLockedWallet.lastClaimedTimestamp();
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
                 await time.increaseTo(cliffTimestamp())
                 await timeLockedWallet.withdraw();
-                const timePassed = (await timeLockedWallet._lastClaimedTimestamp()) - lastWithdrawal;
+                const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - lastWithdrawal;
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
                     .mul(hre.ethers.BigNumber.from(timePassed)).toString();
                 expect((await token.balanceOf(owner.address)).eq(amountToBeWithdrawed)).to.be.true;
@@ -258,7 +258,7 @@ describe('TimeLockedWallet without cliff', function () {
             expect(ownerBalanceBefore.isZero()).to.be.true;
 
             await timeLockedWallet.withdraw();
-            const timePassed = (await timeLockedWallet._lastClaimedTimestamp()) - initTimestamp;
+            const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - initTimestamp;
 
             let amountToBeWithdrawed = vestingRate().mul(timePassed).add(FIRST_DAY_AMOUNT);
             let ownerBalance = await token.balanceOf(owner.address);
