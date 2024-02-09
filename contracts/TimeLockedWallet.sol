@@ -10,7 +10,6 @@ contract TimeLockedWallet is Initializable {
     address public owner;
     address public tokenAddress;
 
-    uint public totalAmount;
     uint public firstDayAmount;
     uint public lockedAmount;
     uint public cliffDuration;
@@ -24,7 +23,6 @@ contract TimeLockedWallet is Initializable {
 
         owner = owner_;
         tokenAddress = tokenAddress_;
-        totalAmount = totalAmount_;
         firstDayAmount = firstDayAmount_;
         lockedAmount = totalAmount_ - firstDayAmount_;
         cliffDuration = cliffDuration_;
@@ -34,22 +32,27 @@ contract TimeLockedWallet is Initializable {
     }
 
     function readyToWithdraw()
-    public view returns (uint amount) {
+    public view returns (uint) {
         uint currentTimestamp = block.timestamp;
 
-        bool firstDayAmountWithdrawn = lastClaimedTimestamp != initTimestamp;
+        //TODO cover with tests
+        if (currentTimestamp < initTimestamp) {
+            return 0;
+        }
 
+        uint firstDayAmount_ = lastClaimedTimestamp != initTimestamp ? 0 : firstDayAmount;
+
+        //TODO cover with tests
         if (currentTimestamp < initTimestamp + cliffDuration) {
-            return firstDayAmountWithdrawn ? 0 : firstDayAmount;
+            return firstDayAmount_;
         }
         if (currentTimestamp >= initTimestamp + fullDuration) {
             return remainingAmount();
         }
 
         uint vestingRate = lockedAmount / fullDuration;
-
         uint timePassed = currentTimestamp - lastClaimedTimestamp;
-        return vestingRate * timePassed + (firstDayAmountWithdrawn ? 0 : firstDayAmount);
+        return vestingRate * timePassed + firstDayAmount_;
     }
 
     function withdraw()
@@ -66,7 +69,7 @@ contract TimeLockedWallet is Initializable {
         emit Withdrawal(withdrawAmount);
     }
 
-    function remainingAmount() public view returns (uint amount) {
+    function remainingAmount() public view returns (uint) {
         return ERC20(tokenAddress).balanceOf(address(this));
     }
 
