@@ -57,7 +57,7 @@ contract TimeLockedWallet is Initializable {
     public {
         uint withdrawAmount = readyToWithdraw();
         if (withdrawAmount == 0) {
-            revert("Nothing to withdraw");
+            return;
         }
 
         lastClaimedTimestamp = block.timestamp;

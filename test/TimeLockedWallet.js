@@ -85,13 +85,14 @@ describe('TimeLockedWallet', function () {
     });
 
     describe('Withdraw', function () {
-        it('should revert before init', async function () {
-            try {
-                await timeLockedWallet.withdraw();
-                expect.fail('Expected withdraw function to throw');
-            } catch (err) {
-                expect(err.message).to.contain('Nothing to withdraw');
-            }
+        it('should not transfer tokens before init', async function () {
+            expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
+            expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
+
+            await timeLockedWallet.withdraw();
+
+            expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
+            expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
         });
 
         it('should withdraw first day amount before cliff', async function () {
@@ -179,15 +180,6 @@ describe('TimeLockedWallet without first day amount', function () {
     });
 
     describe('Withdraw', function () {
-        it('should revert before cliff period', async function () {
-            try {
-                await timeLockedWallet.withdraw();
-                expect.fail('Expected withdraw function to throw');
-            } catch (err) {
-                expect(err.message).to.contain('Nothing to withdraw');
-            }
-        });
-
         it('should withdraw full amount after full duration',
             async function () {
                 await time.increaseTo(fullTimestamp())
