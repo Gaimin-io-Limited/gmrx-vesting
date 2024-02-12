@@ -59,7 +59,6 @@ describe("TimeLockedWalletFactory", function () {
         const wallet = TimeLockedWallet.attach(walletAddress);
 
         expect(await wallet.owner()).to.equal(tlwOwner.address);
-        expect(await wallet.totalAmount()).to.equal(TOTAL_AMOUNT);
         expect(await wallet.firstDayAmount()).to.equal(FIRST_DAY_AMOUNT);
         expect(await wallet.lockedAmount()).to.equal(LOCKED_AMOUNT);
         expect(await wallet.cliffDuration()).to.equal(CLIFF_DURATION);

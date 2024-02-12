@@ -35,14 +35,12 @@ contract TimeLockedWallet is Initializable {
     public view returns (uint) {
         uint currentTimestamp = block.timestamp;
 
-        //TODO cover with tests
         if (currentTimestamp < initTimestamp) {
             return 0;
         }
 
         uint firstDayAmount_ = lastClaimedTimestamp != initTimestamp ? 0 : firstDayAmount;
 
-        //TODO cover with tests
         if (currentTimestamp < initTimestamp + cliffDuration) {
             return firstDayAmount_;
         }

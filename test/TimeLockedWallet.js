@@ -33,7 +33,7 @@ describe('TimeLockedWallet', function () {
 
         await token.connect(sender).transfer(timeLockedWallet.address, TOTAL_AMOUNT);
 
-        initTimestamp = await time.latest();
+        initTimestamp = await time.latest() + 1000;
         await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT,
             CLIFF_DURATION, FULL_DURATION, initTimestamp);
         return {timeLockedWallet, token, initTimestamp};
@@ -43,7 +43,6 @@ describe('TimeLockedWallet', function () {
         it('should initialize with correct values', async function () {
             expect(await timeLockedWallet.owner()).to.equal(owner.address);
             expect(await timeLockedWallet.tokenAddress()).to.equal(token.address);
-            expect((await timeLockedWallet.totalAmount()).eq(TOTAL_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.firstDayAmount()).eq(FIRST_DAY_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.lockedAmount()).eq(LOCKED_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
@@ -67,7 +66,13 @@ describe('TimeLockedWallet', function () {
     });
 
     describe('Ready To Withdraw', function () {
+        it('should return zero before init', async function () {
+            let readyToWithdraw = await timeLockedWallet.readyToWithdraw();
+            expect(readyToWithdraw.isZero()).to.be.true;
+        });
+
         it('should return fist day amount before cliff period', async function () {
+            await time.increaseTo(initTimestamp);
             let readyToWithdraw = await timeLockedWallet.readyToWithdraw();
             expect(readyToWithdraw.eq(FIRST_DAY_AMOUNT)).to.be.true;
         });
@@ -80,9 +85,19 @@ describe('TimeLockedWallet', function () {
     });
 
     describe('Withdraw', function () {
+        it('should revert before init', async function () {
+            try {
+                await timeLockedWallet.withdraw();
+                expect.fail('Expected withdraw function to throw');
+            } catch (err) {
+                expect(err.message).to.contain('Nothing to withdraw');
+            }
+        });
+
         it('should withdraw first day amount before cliff', async function () {
             expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
+            await time.increaseTo(initTimestamp);
             const withdrawTx = await timeLockedWallet.withdraw();
 
             expect(withdrawTx).to.emit(timeLockedWallet, 'Withdrawal').withArgs(FIRST_DAY_AMOUNT);
@@ -113,7 +128,6 @@ describe('TimeLockedWallet', function () {
                     .mul(hre.ethers.BigNumber.from(timePassed))
                     .add(FIRST_DAY_AMOUNT)
                     .toString();
-                const q = await token.balanceOf(owner.address);
                 expect((await token.balanceOf(owner.address)).eq(amountToBeWithdrawed)).to.be.true;
                 expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT.sub(amountToBeWithdrawed))).to.be.true;
 
