@@ -10,21 +10,21 @@ contract TimeLockedWallet is Initializable {
     address public owner;
     address public tokenAddress;
 
-    uint public firstDayAmount;
+    uint public tgeAmount;
     uint public lockedAmount;
     uint public cliffDuration;
     uint public fullDuration;
     uint public initTimestamp;
     uint public lastClaimedTimestamp;
 
-    function initialize(address owner_, address tokenAddress_, uint totalAmount_, uint firstDayAmount_, uint cliffDuration_, uint fullDuration_, uint initTimestamp_)
+    function initialize(address owner_, address tokenAddress_, uint totalAmount_, uint tgeAmount_, uint cliffDuration_, uint fullDuration_, uint initTimestamp_)
     public initializer {
-        _validateInitialize(owner_, tokenAddress_, totalAmount_, firstDayAmount_);
+        _validateInitialize(owner_, tokenAddress_, totalAmount_, tgeAmount_);
 
         owner = owner_;
         tokenAddress = tokenAddress_;
-        firstDayAmount = firstDayAmount_;
-        lockedAmount = totalAmount_ - firstDayAmount_;
+        tgeAmount = tgeAmount_;
+        lockedAmount = totalAmount_ - tgeAmount_;
         cliffDuration = cliffDuration_;
         fullDuration = fullDuration_;
         initTimestamp = initTimestamp_;
@@ -39,10 +39,10 @@ contract TimeLockedWallet is Initializable {
             return 0;
         }
 
-        uint firstDayAmount_ = lastClaimedTimestamp != initTimestamp ? 0 : firstDayAmount;
+        uint tgeAmount_ = lastClaimedTimestamp != initTimestamp ? 0 : tgeAmount;
 
         if (currentTimestamp < initTimestamp + cliffDuration) {
-            return firstDayAmount_;
+            return tgeAmount_;
         }
         if (currentTimestamp >= initTimestamp + fullDuration) {
             return remainingAmount();
@@ -50,7 +50,7 @@ contract TimeLockedWallet is Initializable {
 
         uint vestingRate = lockedAmount / fullDuration;
         uint timePassed = currentTimestamp - lastClaimedTimestamp;
-        return vestingRate * timePassed + firstDayAmount_;
+        return vestingRate * timePassed + tgeAmount_;
     }
 
     function withdraw()
@@ -71,11 +71,11 @@ contract TimeLockedWallet is Initializable {
         return ERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function _validateInitialize(address owner_, address tokenAddress_, uint totalAmount_, uint firstDayAmount_)
+    function _validateInitialize(address owner_, address tokenAddress_, uint totalAmount_, uint tgeAmount_)
     private view {
         require(owner_ != address(0), "Owner address is invalid");
         require(totalAmount_ > 0, "Amount must be greater than zero");
-        require(firstDayAmount_ <= totalAmount_, "First day amount must not be greater then total amount");
+        require(tgeAmount_ <= totalAmount_, "TGE amount must not be greater then total amount");
         require(ERC20(tokenAddress_).balanceOf(address(this)) == totalAmount_, "Amount of tokens should already be transferred to this locked contract");
     }
 

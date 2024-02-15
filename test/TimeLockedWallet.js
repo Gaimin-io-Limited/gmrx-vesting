@@ -15,8 +15,8 @@ describe('TimeLockedWallet', function () {
     let TimeLockedWallet, Token, timeLockedWallet, token, owner, sender;
 
     const TOTAL_AMOUNT = BigNumber.from('10000000000000000000000'); // 10000 GMRX
-    const FIRST_DAY_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
-    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(FIRST_DAY_AMOUNT);
+    const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
+    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 60 * 60 * 24 * 30; // 30 days
     const FULL_DURATION = 60 * 60 * 24 * 365; // 1 year
     let initTimestamp;
@@ -34,7 +34,7 @@ describe('TimeLockedWallet', function () {
         await token.connect(sender).transfer(timeLockedWallet.address, TOTAL_AMOUNT);
 
         initTimestamp = await time.latest() + 1000;
-        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT,
+        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
             CLIFF_DURATION, FULL_DURATION, initTimestamp);
         return {timeLockedWallet, token, initTimestamp};
     });
@@ -43,7 +43,7 @@ describe('TimeLockedWallet', function () {
         it('should initialize with correct values', async function () {
             expect(await timeLockedWallet.owner()).to.equal(owner.address);
             expect(await timeLockedWallet.tokenAddress()).to.equal(token.address);
-            expect((await timeLockedWallet.firstDayAmount()).eq(FIRST_DAY_AMOUNT)).to.be.true;
+            expect((await timeLockedWallet.tgeAmount()).eq(TGE_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.lockedAmount()).eq(LOCKED_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.cliffDuration()).eq(CLIFF_DURATION)).to.be.true;
@@ -74,7 +74,7 @@ describe('TimeLockedWallet', function () {
         it('should return fist day amount before cliff period', async function () {
             await time.increaseTo(initTimestamp);
             let readyToWithdraw = await timeLockedWallet.readyToWithdraw();
-            expect(readyToWithdraw.eq(FIRST_DAY_AMOUNT)).to.be.true;
+            expect(readyToWithdraw.eq(TGE_AMOUNT)).to.be.true;
         });
 
         it('should return full amount after full duration', async function () {
@@ -95,14 +95,14 @@ describe('TimeLockedWallet', function () {
             expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
         });
 
-        it('should withdraw first day amount before cliff', async function () {
+        it('should withdraw TGE amount before cliff', async function () {
             expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
             await time.increaseTo(initTimestamp);
             const withdrawTx = await timeLockedWallet.withdraw();
 
-            expect(withdrawTx).to.emit(timeLockedWallet, 'Withdrawal').withArgs(FIRST_DAY_AMOUNT);
-            expect((await token.balanceOf(owner.address)).eq(FIRST_DAY_AMOUNT)).to.be.true;
+            expect(withdrawTx).to.emit(timeLockedWallet, 'Withdrawal').withArgs(TGE_AMOUNT);
+            expect((await token.balanceOf(owner.address)).eq(TGE_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.remainingAmount()).eq(LOCKED_AMOUNT)).to.be.true;
         });
 
@@ -127,7 +127,7 @@ describe('TimeLockedWallet', function () {
                 const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - lastWithdrawal;
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
                     .mul(hre.ethers.BigNumber.from(timePassed))
-                    .add(FIRST_DAY_AMOUNT)
+                    .add(TGE_AMOUNT)
                     .toString();
                 expect((await token.balanceOf(owner.address)).eq(amountToBeWithdrawed)).to.be.true;
                 expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT.sub(amountToBeWithdrawed))).to.be.true;
@@ -152,12 +152,12 @@ describe('TimeLockedWallet', function () {
 
 });
 
-describe('TimeLockedWallet without first day amount', function () {
+describe('TimeLockedWallet without TGE amount', function () {
     let TimeLockedWallet, Token, timeLockedWallet, token, owner, sender;
 
     const TOTAL_AMOUNT = BigNumber.from('10000000000000000000000'); // 10000 GMRX
-    const FIRST_DAY_AMOUNT = BigNumber.from('0');
-    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(FIRST_DAY_AMOUNT);
+    const TGE_AMOUNT = BigNumber.from('0');
+    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 60 * 60 * 24 * 30; // 30 days
     const FULL_DURATION = 60 * 60 * 24 * 365; // 1 year
     let initTimestamp;
@@ -175,7 +175,7 @@ describe('TimeLockedWallet without first day amount', function () {
         await token.connect(sender).transfer(timeLockedWallet.address, TOTAL_AMOUNT);
 
         initTimestamp = await time.latest();
-        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT,
+        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
             CLIFF_DURATION, FULL_DURATION, initTimestamp);
     });
 
@@ -228,8 +228,8 @@ describe('TimeLockedWallet without cliff', function () {
     let TimeLockedWallet, Token, timeLockedWallet, token, owner, sender;
 
     const TOTAL_AMOUNT = BigNumber.from('10000000000000000000000'); // 10000 GMRX
-    const FIRST_DAY_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
-    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(FIRST_DAY_AMOUNT);
+    const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
+    const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 0;
     const FULL_DURATION = 60 * 60 * 24 * 30; // 1 month
     let initTimestamp;
@@ -247,7 +247,7 @@ describe('TimeLockedWallet without cliff', function () {
         await token.connect(sender).transfer(timeLockedWallet.address, TOTAL_AMOUNT);
 
         initTimestamp = await time.latest();
-        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT,
+        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
             CLIFF_DURATION, FULL_DURATION, initTimestamp);
     });
 
@@ -266,7 +266,7 @@ describe('TimeLockedWallet without cliff', function () {
             await timeLockedWallet.withdraw();
             const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - initTimestamp;
 
-            let amountToBeWithdrawed = vestingRate().mul(timePassed).add(FIRST_DAY_AMOUNT);
+            let amountToBeWithdrawed = vestingRate().mul(timePassed).add(TGE_AMOUNT);
             let ownerBalance = await token.balanceOf(owner.address);
 
             expect(ownerBalance.eq(amountToBeWithdrawed)).to.be.true;
@@ -283,7 +283,7 @@ describe('TimeLockedWallet without duration', function () {
     let TimeLockedWallet, Token, timeLockedWallet, token, owner, sender;
 
     const TOTAL_AMOUNT = BigNumber.from('10000000000000000000000'); // 10000 GMRX
-    const FIRST_DAY_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
+    const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
     const CLIFF_DURATION = 0;
     const FULL_DURATION = 0;
     let initTimestamp;
@@ -301,7 +301,7 @@ describe('TimeLockedWallet without duration', function () {
         await token.connect(sender).transfer(timeLockedWallet.address, TOTAL_AMOUNT);
 
         initTimestamp = await time.latest();
-        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, FIRST_DAY_AMOUNT,
+        await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
             CLIFF_DURATION, FULL_DURATION, initTimestamp);
     });
 

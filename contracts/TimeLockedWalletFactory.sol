@@ -32,31 +32,31 @@ contract TimeLockedWalletFactory is Ownable {
         tlwAddress = tlwAddress_;
     }
 
-    function newTimeLockedWallet(address owner, uint totalAmount, uint firstDayAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    function newTimeLockedWallet(address owner, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
     public returns (address wallet) {
-        _validateNewTimeLockedWallet(owner, totalAmount, firstDayAmount);
+        _validateNewTimeLockedWallet(owner, totalAmount, tgeAmount);
 
         ERC20 token = ERC20(tokenAddress);
         require(totalAmount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :totalAmount of tokens");
 
         wallet = Clones.clone(tlwAddress);
         require(token.transferFrom(msg.sender, wallet, totalAmount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, firstDayAmount, cliffDuration, fullDuration, initTimestamp);
+        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
 
         wallets[msg.sender].push(wallet);
         if (msg.sender != owner) {
             wallets[owner].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, totalAmount, firstDayAmount, cliffDuration, fullDuration, initTimestamp);
+        emit Created(wallet, msg.sender, owner, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
     }
 
-    function _validateNewTimeLockedWallet(address owner, uint totalAmount, uint firstDayAmount)
+    function _validateNewTimeLockedWallet(address owner, uint totalAmount, uint tgeAmount)
     private pure {
         require(owner != address(0), "Owner address is invalid");
         require(totalAmount > 0, "Total amount must be greater than zero");
-        require(firstDayAmount <= totalAmount, "First day amount must not be greater then total amount");
+        require(tgeAmount <= totalAmount, "TGE amount must not be greater then total amount");
     }
 
-    event Created(address wallet, address from, address to, uint totalAmount, uint firstDayAmount, uint cliffDuration, uint fullDuration, uint initTimestamp);
+    event Created(address wallet, address from, address to, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp);
 
 }
