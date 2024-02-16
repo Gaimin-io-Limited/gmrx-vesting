@@ -8,7 +8,8 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract TimeLockedWalletFactory is Ownable {
 
-    mapping(address => address[]) wallets;
+    mapping(address => mapping(uint => address[])) public wallets;
+
     address public tokenAddress;
     address public tlwAddress;
 
@@ -17,9 +18,9 @@ contract TimeLockedWalletFactory is Ownable {
         setTLWAddress(tlwAddress_);
     }
 
-    function getWallets(address user)
+    function getWallets(address user, uint groupId)
     public view onlyOwner returns (address[] memory) {
-        return wallets[user];
+        return wallets[user][groupId];
     }
 
     function setTokenAddress(address tokenAddress_)
@@ -32,7 +33,7 @@ contract TimeLockedWalletFactory is Ownable {
         tlwAddress = tlwAddress_;
     }
 
-    function newTimeLockedWallet(address owner, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    function newTimeLockedWallet(address owner, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
     public returns (address wallet) {
         _validateNewTimeLockedWallet(owner, totalAmount, tgeAmount);
 
@@ -43,11 +44,18 @@ contract TimeLockedWalletFactory is Ownable {
         require(token.transferFrom(msg.sender, wallet, totalAmount), "Token transfer failed");
         TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
 
-        wallets[msg.sender].push(wallet);
+        wallets[msg.sender][groupId].push(wallet);
         if (msg.sender != owner) {
-            wallets[owner].push(wallet);
+            wallets[owner][groupId].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
+        emit Created(wallet, msg.sender, owner, groupId, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
+    }
+
+    function withdrawAll(address owner, uint groupId)
+    public {
+        for (uint i = 0; i < wallets[owner][groupId].length; i++) {
+            TimeLockedWallet(wallets[owner][groupId][i]).withdraw();
+        }
     }
 
     function _validateNewTimeLockedWallet(address owner, uint totalAmount, uint tgeAmount)
@@ -57,6 +65,6 @@ contract TimeLockedWalletFactory is Ownable {
         require(tgeAmount <= totalAmount, "TGE amount must not be greater then total amount");
     }
 
-    event Created(address wallet, address from, address to, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp);
+    event Created(address wallet, address from, address to, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp);
 
 }

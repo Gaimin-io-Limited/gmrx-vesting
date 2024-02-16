@@ -13,6 +13,7 @@ describe("TimeLockedWalletFactory", function () {
     let TimeLockedWalletFactory, timeLockedWalletFactory, TimeLockedWallet, timeLockedWallet,
         Token, token, tokenOwner, tlwOwner, randomAddress;
 
+    const GROUP_ID = 1;
     const TOTAL_AMOUNT = hre.ethers.BigNumber.from('10000000000000000000000'); // 10000 GMRX
     const TGE_AMOUNT = hre.ethers.BigNumber.from('1000000000000000000000'); // 1000 GMRX
     const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
@@ -36,23 +37,23 @@ describe("TimeLockedWalletFactory", function () {
 
     it("creates a new time locked wallet and emit event", async function () {
         const newTimeLockedWalletTx = await timeLockedWalletFactory.connect(tokenOwner)
-            .newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            .newTimeLockedWallet(tlwOwner.address, GROUP_ID, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
         const receipt = await newTimeLockedWalletTx.wait();
         const walletAddress = receipt.events?.find(e => e.event === 'Created').args.wallet;
 
         await expect(newTimeLockedWalletTx)
             .to.emit(timeLockedWalletFactory, 'Created')
-            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            .withArgs(walletAddress, tokenOwner.address, tlwOwner.address, GROUP_ID, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
     });
 
     it("creates a new time locked wallet using clone method", async function () {
-        const initialWalletsCount = (await timeLockedWalletFactory.getWallets(tokenOwner.address)).length;
+        const initialWalletsCount = (await timeLockedWalletFactory.getWallets(tokenOwner.address, GROUP_ID)).length;
 
-        const tx = await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
+        const tx = await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, GROUP_ID, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
         const receipt = await tx.wait();
         const walletAddress = receipt.events?.find(e => e.event === 'Created').args.wallet;
 
-        const newWalletsCount = (await timeLockedWalletFactory.getWallets(tokenOwner.address)).length;
+        const newWalletsCount = (await timeLockedWalletFactory.getWallets(tokenOwner.address, GROUP_ID)).length;
 
         expect(newWalletsCount).to.equal(initialWalletsCount + 1);
 
@@ -67,12 +68,12 @@ describe("TimeLockedWalletFactory", function () {
     });
 
     it("fails to create a new time locked wallet with zero amount", async function () {
-        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 0, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp))
+        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, GROUP_ID, 0, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp))
             .to.be.revertedWith("Total amount must be greater than zero");
     });
 
     it("fails to create a new time locked wallet with TGE amount greater than total amount", async function () {
-        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, 10, 100, CLIFF_DURATION, FULL_DURATION, initTimestamp))
+        await expect(timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, GROUP_ID, 10, 100, CLIFF_DURATION, FULL_DURATION, initTimestamp))
             .to.be.revertedWith("TGE amount must not be greater then total amount");
     });
 
@@ -87,8 +88,8 @@ describe("TimeLockedWalletFactory", function () {
     });
 
     it("gets the wallets of a user", async function () {
-        await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
-        const wallets = await timeLockedWalletFactory.getWallets(tlwOwner.address);
+        await timeLockedWalletFactory.newTimeLockedWallet(tlwOwner.address, GROUP_ID, TOTAL_AMOUNT, TGE_AMOUNT, CLIFF_DURATION, FULL_DURATION, initTimestamp);
+        const wallets = await timeLockedWalletFactory.getWallets(tlwOwner.address, GROUP_ID);
         expect(wallets.length).to.equal(1);
     });
 });
