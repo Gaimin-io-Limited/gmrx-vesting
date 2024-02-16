@@ -59,7 +59,7 @@ describe('TimeLockedWallet', function () {
 
         it('should return zero after full duration withdrawal was made',
             async function () {
-                await time.increaseTo(fullTimestamp());
+                await time.increaseTo(fullTimestampHex());
                 await timeLockedWallet.withdraw();
                 expect((await timeLockedWallet.remainingAmount()).isZero()).to.be.true;
             });
@@ -78,7 +78,7 @@ describe('TimeLockedWallet', function () {
         });
 
         it('should return full amount after full duration', async function () {
-            await time.increaseTo(fullTimestamp())
+            await time.increaseTo(fullTimestampHex())
             let readyToWithdraw = await timeLockedWallet.readyToWithdraw();
             expect(readyToWithdraw.eq(TOTAL_AMOUNT)).to.be.true;
         });
@@ -108,7 +108,7 @@ describe('TimeLockedWallet', function () {
 
         it('should withdraw full amount after full duration',
             async function () {
-                await time.increaseTo(fullTimestamp())
+                await time.increaseTo(fullTimestampHex())
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
                 const withdrawTx = await timeLockedWallet.withdraw();
 
@@ -119,35 +119,35 @@ describe('TimeLockedWallet', function () {
 
         it('should withdraw part after cliff duration and remaining after full duration',
             async function () {
-                const lastWithdrawal = await timeLockedWallet.lastClaimedTimestamp();
+                const TIME_AFTER_CLIFF = 60 * 60 * 24; // 1 day
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
-                await time.increaseTo(cliffTimestamp())
+                await time.increaseTo(cliffEndTimestamp().add(TIME_AFTER_CLIFF).toHexString())
                 await timeLockedWallet.withdraw();
-                const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - lastWithdrawal;
+                let lastClaimedTimestamp = await timeLockedWallet.lastClaimedTimestamp();
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
-                    .mul(hre.ethers.BigNumber.from(timePassed))
+                    .mul(hre.ethers.BigNumber.from(lastClaimedTimestamp.sub(cliffEndTimestamp())))
                     .add(TGE_AMOUNT)
                     .toString();
                 expect((await token.balanceOf(owner.address)).eq(amountToBeWithdrawed)).to.be.true;
                 expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT.sub(amountToBeWithdrawed))).to.be.true;
 
-                await time.increaseTo(fullTimestamp())
+                await time.increaseTo(fullTimestampHex())
                 await timeLockedWallet.withdraw();
                 expect((await token.balanceOf(owner.address)).toString()).to.equal((TOTAL_AMOUNT).toString());
             });
     });
 
     function vestingRate() {
-        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION))
+        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION));
     }
 
-    function cliffTimestamp() {
-        return BigNumber.from(initTimestamp + CLIFF_DURATION).toHexString()
+    function cliffEndTimestamp() {
+        return BigNumber.from(initTimestamp + CLIFF_DURATION);
     }
 
-    function fullTimestamp() {
-        return BigNumber.from(initTimestamp + FULL_DURATION).toHexString();
+    function fullTimestampHex() {
+        return BigNumber.from(initTimestamp + CLIFF_DURATION + FULL_DURATION).toHexString();
     }
 
 });
@@ -182,7 +182,7 @@ describe('TimeLockedWallet without TGE amount', function () {
     describe('Withdraw', function () {
         it('should withdraw full amount after full duration',
             async function () {
-                await time.increaseTo(fullTimestamp())
+                await time.increaseTo(fullTimestampHex())
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
                 const withdrawTx = await timeLockedWallet.withdraw();
 
@@ -193,33 +193,35 @@ describe('TimeLockedWallet without TGE amount', function () {
 
         it('should withdraw part after cliff duration and remaining after full duration',
             async function () {
-                const lastWithdrawal = await timeLockedWallet.lastClaimedTimestamp();
+                const TIME_AFTER_CLIFF = 60 * 60 * 24; // 1 day
                 expect((await token.balanceOf(owner.address)).isZero()).to.be.true;
 
-                await time.increaseTo(cliffTimestamp())
+                await time.increaseTo(cliffEndTimestamp().add(TIME_AFTER_CLIFF).toHexString())
                 await timeLockedWallet.withdraw();
-                const timePassed = (await timeLockedWallet.lastClaimedTimestamp()) - lastWithdrawal;
+                let lastClaimedTimestamp = await timeLockedWallet.lastClaimedTimestamp();
                 let amountToBeWithdrawed = hre.ethers.BigNumber.from(vestingRate())
-                    .mul(hre.ethers.BigNumber.from(timePassed)).toString();
+                    .mul(hre.ethers.BigNumber.from(lastClaimedTimestamp.sub(cliffEndTimestamp())))
+                    .add(TGE_AMOUNT)
+                    .toString();
                 expect((await token.balanceOf(owner.address)).eq(amountToBeWithdrawed)).to.be.true;
-                expect((await timeLockedWallet.remainingAmount()).eq(LOCKED_AMOUNT.sub(amountToBeWithdrawed))).to.be.true;
+                expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT.sub(amountToBeWithdrawed))).to.be.true;
 
-                await time.increaseTo(fullTimestamp())
+                await time.increaseTo(fullTimestampHex())
                 await timeLockedWallet.withdraw();
-                expect((await token.balanceOf(owner.address)).toString()).to.equal((LOCKED_AMOUNT).toString());
+                expect((await token.balanceOf(owner.address)).toString()).to.equal((TOTAL_AMOUNT).toString());
             });
     });
 
     function vestingRate() {
-        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION))
+        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION));
     }
 
-    function cliffTimestamp() {
-        return BigNumber.from(initTimestamp + CLIFF_DURATION).toHexString()
+    function cliffEndTimestamp() {
+        return BigNumber.from(initTimestamp + CLIFF_DURATION);
     }
 
-    function fullTimestamp() {
-        return BigNumber.from(initTimestamp + FULL_DURATION).toHexString();
+    function fullTimestampHex() {
+        return BigNumber.from(initTimestamp + CLIFF_DURATION + FULL_DURATION).toHexString();
     }
 
 });

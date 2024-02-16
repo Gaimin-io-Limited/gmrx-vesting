@@ -39,17 +39,18 @@ contract TimeLockedWallet is Initializable {
             return 0;
         }
 
+        uint cliffEndTimestamp = initTimestamp + cliffDuration;
         uint tgeAmount_ = lastClaimedTimestamp != initTimestamp ? 0 : tgeAmount;
 
-        if (currentTimestamp < initTimestamp + cliffDuration) {
+        if (currentTimestamp < cliffEndTimestamp) {
             return tgeAmount_;
         }
-        if (currentTimestamp >= initTimestamp + fullDuration) {
+        if (currentTimestamp >= initTimestamp + cliffDuration + fullDuration) {
             return remainingAmount();
         }
 
         uint vestingRate = lockedAmount / fullDuration;
-        uint timePassed = currentTimestamp - lastClaimedTimestamp;
+        uint timePassed = currentTimestamp - (lastClaimedTimestamp > cliffEndTimestamp ? lastClaimedTimestamp : cliffEndTimestamp);
         return vestingRate * timePassed + tgeAmount_;
     }
 
