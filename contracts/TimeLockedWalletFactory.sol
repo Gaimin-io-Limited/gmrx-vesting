@@ -51,10 +51,10 @@ contract TimeLockedWalletFactory is Ownable {
         emit Created(wallet, msg.sender, owner, groupId, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
     }
 
-    function withdrawAll(address owner, uint groupId)
+    function withdrawAll(address sender, uint groupId)
     public {
-        for (uint i = 0; i < wallets[owner][groupId].length; i++) {
-            TimeLockedWallet(wallets[owner][groupId][i]).withdraw();
+        for (uint i = 0; i < wallets[sender][groupId].length; i++) {
+            TimeLockedWallet(wallets[sender][groupId][i]).withdraw();
         }
     }
 
