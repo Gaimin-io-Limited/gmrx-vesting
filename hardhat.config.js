@@ -14,7 +14,8 @@ module.exports = {
             url: `https://bsc-mainnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
             chainId: 56
-        }, bnb_chain_testnet: {
+        },
+        bnb_chain_testnet: {
             url: `https://bsc-testnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
             chainId: 97
@@ -32,7 +33,7 @@ module.exports = {
     etherscan: {
         apiKey: {
             bsc: bscscanApikey,
-            bscTestnet: bscscanApikey,
+            bscTestnet: bscscanApikey
         }
     }
 };
