@@ -21,7 +21,7 @@ module.exports = {
         }
     },
     solidity: {
-        version: "0.8.23",
+        version: "0.8.24",
         settings: {
             optimizer: {
                 enabled: false,
@@ -32,7 +32,7 @@ module.exports = {
     etherscan: {
         apiKey: {
             bsc: bscscanApikey,
-            bscTestnet: bscscanApikey,
+            bscTestnet: bscscanApikey
         }
     }
 };
