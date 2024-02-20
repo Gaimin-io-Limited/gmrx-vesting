@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.24;
 
 import {ERC20, TimeLockedWallet} from "./TimeLockedWallet.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -19,7 +19,7 @@ contract TimeLockedWalletFactory is Ownable {
     }
 
     function getWallets(address user, uint groupId)
-    public view onlyOwner returns (address[] memory) {
+    public view returns (address[] memory) {
         return wallets[user][groupId];
     }
 
