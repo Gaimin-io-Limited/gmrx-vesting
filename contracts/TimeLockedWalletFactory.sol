@@ -19,7 +19,7 @@ contract TimeLockedWalletFactory is Ownable {
     }
 
     function getWallets(address user, uint groupId)
-    public view onlyOwner returns (address[] memory) {
+    public view returns (address[] memory) {
         return wallets[user][groupId];
     }
 
