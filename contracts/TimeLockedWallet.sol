@@ -68,7 +68,8 @@ contract TimeLockedWallet is Initializable {
         emit Withdrawal(withdrawAmount);
     }
 
-    function remainingAmount() public view returns (uint) {
+    function remainingAmount()
+    public view returns (uint) {
         return ERC20(tokenAddress).balanceOf(address(this));
     }
 
