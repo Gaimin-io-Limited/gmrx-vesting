@@ -13,11 +13,11 @@ contract TimeLockedWallet is Initializable {
     uint public tgeAmount;
     uint public lockedAmount;
     uint public cliffDuration;
-    uint public fullDuration;
+    uint public vestingDuration;
     uint public initTimestamp;
     uint public lastClaimedTimestamp;
 
-    function initialize(address owner_, address tokenAddress_, uint totalAmount_, uint tgeAmount_, uint cliffDuration_, uint fullDuration_, uint initTimestamp_)
+    function initialize(address owner_, address tokenAddress_, uint totalAmount_, uint tgeAmount_, uint cliffDuration_, uint vestingDuration_, uint initTimestamp_)
     public initializer {
         _validateInitialize(owner_, tokenAddress_, totalAmount_, tgeAmount_);
 
@@ -26,7 +26,7 @@ contract TimeLockedWallet is Initializable {
         tgeAmount = tgeAmount_;
         lockedAmount = totalAmount_ - tgeAmount_;
         cliffDuration = cliffDuration_;
-        fullDuration = fullDuration_;
+        vestingDuration = vestingDuration_;
         initTimestamp = initTimestamp_;
         lastClaimedTimestamp = initTimestamp_;
     }
@@ -45,11 +45,11 @@ contract TimeLockedWallet is Initializable {
         if (currentTimestamp < cliffEndTimestamp) {
             return tgeAmount_;
         }
-        if (currentTimestamp >= initTimestamp + cliffDuration + fullDuration) {
+        if (currentTimestamp >= initTimestamp + cliffDuration + vestingDuration) {
             return remainingAmount();
         }
 
-        uint vestingRate = lockedAmount / fullDuration;
+        uint vestingRate = lockedAmount / vestingDuration;
         uint timePassed = currentTimestamp - (lastClaimedTimestamp > cliffEndTimestamp ? lastClaimedTimestamp : cliffEndTimestamp);
         return vestingRate * timePassed + tgeAmount_;
     }

@@ -18,7 +18,7 @@ describe('TimeLockedWallet', function () {
     const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
     const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 60 * 60 * 24 * 30; // 30 days
-    const FULL_DURATION = 60 * 60 * 24 * 365; // 1 year
+    const VESTING_DURATION = 60 * 60 * 24 * 365; // 1 year
     let initTimestamp;
 
     beforeEach(async function () {
@@ -35,7 +35,7 @@ describe('TimeLockedWallet', function () {
 
         initTimestamp = await time.latest() + 1000;
         await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
-            CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            CLIFF_DURATION, VESTING_DURATION, initTimestamp);
         return {timeLockedWallet, token, initTimestamp};
     });
 
@@ -47,7 +47,7 @@ describe('TimeLockedWallet', function () {
             expect((await timeLockedWallet.lockedAmount()).eq(LOCKED_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.remainingAmount()).eq(TOTAL_AMOUNT)).to.be.true;
             expect((await timeLockedWallet.cliffDuration()).eq(CLIFF_DURATION)).to.be.true;
-            expect((await timeLockedWallet.fullDuration()).eq(FULL_DURATION)).to.be.true;
+            expect((await timeLockedWallet.vestingDuration()).eq(VESTING_DURATION)).to.be.true;
             expect((await timeLockedWallet.initTimestamp()).eq(initTimestamp)).to.be.true;
         });
     });
@@ -139,7 +139,7 @@ describe('TimeLockedWallet', function () {
     });
 
     function vestingRate() {
-        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION));
+        return LOCKED_AMOUNT.div(BigNumber.from(VESTING_DURATION));
     }
 
     function cliffEndTimestamp() {
@@ -147,7 +147,7 @@ describe('TimeLockedWallet', function () {
     }
 
     function fullTimestampHex() {
-        return BigNumber.from(initTimestamp + CLIFF_DURATION + FULL_DURATION).toHexString();
+        return BigNumber.from(initTimestamp + CLIFF_DURATION + VESTING_DURATION).toHexString();
     }
 
 });
@@ -159,7 +159,7 @@ describe('TimeLockedWallet without TGE amount', function () {
     const TGE_AMOUNT = BigNumber.from('0');
     const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 60 * 60 * 24 * 30; // 30 days
-    const FULL_DURATION = 60 * 60 * 24 * 365; // 1 year
+    const VESTING_DURATION = 60 * 60 * 24 * 365; // 1 year
     let initTimestamp;
 
     beforeEach(async function () {
@@ -176,7 +176,7 @@ describe('TimeLockedWallet without TGE amount', function () {
 
         initTimestamp = await time.latest();
         await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
-            CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            CLIFF_DURATION, VESTING_DURATION, initTimestamp);
     });
 
     describe('Withdraw', function () {
@@ -213,7 +213,7 @@ describe('TimeLockedWallet without TGE amount', function () {
     });
 
     function vestingRate() {
-        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION));
+        return LOCKED_AMOUNT.div(BigNumber.from(VESTING_DURATION));
     }
 
     function cliffEndTimestamp() {
@@ -221,7 +221,7 @@ describe('TimeLockedWallet without TGE amount', function () {
     }
 
     function fullTimestampHex() {
-        return BigNumber.from(initTimestamp + CLIFF_DURATION + FULL_DURATION).toHexString();
+        return BigNumber.from(initTimestamp + CLIFF_DURATION + VESTING_DURATION).toHexString();
     }
 
 });
@@ -233,7 +233,7 @@ describe('TimeLockedWallet without cliff', function () {
     const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
     const LOCKED_AMOUNT = TOTAL_AMOUNT.sub(TGE_AMOUNT);
     const CLIFF_DURATION = 0;
-    const FULL_DURATION = 60 * 60 * 24 * 30; // 1 month
+    const VESTING_DURATION = 60 * 60 * 24 * 30; // 1 month
     let initTimestamp;
 
     beforeEach(async function () {
@@ -250,7 +250,7 @@ describe('TimeLockedWallet without cliff', function () {
 
         initTimestamp = await time.latest();
         await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
-            CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            CLIFF_DURATION, VESTING_DURATION, initTimestamp);
     });
 
     describe('Ready To Withdraw', function () {
@@ -276,7 +276,7 @@ describe('TimeLockedWallet without cliff', function () {
     });
 
     function vestingRate() {
-        return LOCKED_AMOUNT.div(BigNumber.from(FULL_DURATION))
+        return LOCKED_AMOUNT.div(BigNumber.from(VESTING_DURATION))
     }
 
 });
@@ -287,7 +287,7 @@ describe('TimeLockedWallet without duration', function () {
     const TOTAL_AMOUNT = BigNumber.from('10000000000000000000000'); // 10000 GMRX
     const TGE_AMOUNT = BigNumber.from('1000000000000000000000'); // 1000 GMRX
     const CLIFF_DURATION = 0;
-    const FULL_DURATION = 0;
+    const VESTING_DURATION = 0;
     let initTimestamp;
 
     beforeEach(async function () {
@@ -304,7 +304,7 @@ describe('TimeLockedWallet without duration', function () {
 
         initTimestamp = await time.latest();
         await timeLockedWallet.initialize(owner.address, token.address, TOTAL_AMOUNT, TGE_AMOUNT,
-            CLIFF_DURATION, FULL_DURATION, initTimestamp);
+            CLIFF_DURATION, VESTING_DURATION, initTimestamp);
     });
 
 

@@ -33,7 +33,7 @@ contract TimeLockedWalletFactory is Ownable {
         tlwAddress = tlwAddress_;
     }
 
-    function newTimeLockedWallet(address owner, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    function newTimeLockedWallet(address owner, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint vestingDuration, uint initTimestamp)
     public returns (address wallet) {
         _validateNewTimeLockedWallet(owner, totalAmount, tgeAmount);
 
@@ -42,13 +42,13 @@ contract TimeLockedWalletFactory is Ownable {
 
         wallet = Clones.clone(tlwAddress);
         require(token.transferFrom(msg.sender, wallet, totalAmount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
+        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, tgeAmount, cliffDuration, vestingDuration, initTimestamp);
 
         wallets[msg.sender][groupId].push(wallet);
         if (msg.sender != owner) {
             wallets[owner][groupId].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, groupId, totalAmount, tgeAmount, cliffDuration, fullDuration, initTimestamp);
+        emit Created(wallet, msg.sender, owner, groupId, totalAmount, tgeAmount, cliffDuration, vestingDuration, initTimestamp);
     }
 
     function withdrawAll(address sender, uint groupId)
