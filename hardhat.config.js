@@ -14,25 +14,27 @@ module.exports = {
             url: `https://bsc-mainnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
             chainId: 56
-        }, bnb_chain_testnet: {
+        },
+        bnb_chain_testnet: {
             url: `https://bsc-testnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
             chainId: 97
         }
     },
     solidity: {
-        version: "0.8.23",
-        settings: {
-            optimizer: {
-                enabled: false,
-                runs: 200
+        compilers: [
+            {
+                version: "0.8.23"
+            },
+            {
+                version: "0.8.24"
             }
-        }
+        ]
     },
     etherscan: {
         apiKey: {
             bsc: bscscanApikey,
-            bscTestnet: bscscanApikey,
+            bscTestnet: bscscanApikey
         }
     }
 };

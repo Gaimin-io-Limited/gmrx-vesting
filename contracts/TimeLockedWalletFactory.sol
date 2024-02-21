@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.24;
 
 import {ERC20, TimeLockedWallet} from "./TimeLockedWallet.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -8,53 +8,63 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract TimeLockedWalletFactory is Ownable {
 
-    mapping(address => address[]) wallets;
-    address public _tokenAddress;
-    address public _tlwAddress;
+    mapping(address => mapping(uint => address[])) public wallets;
 
-    constructor(address tokenAddress, address tlwAddress) Ownable(msg.sender) {
-        setTokenAddress(tokenAddress);
-        setTLWAddress(tlwAddress);
+    address public tokenAddress;
+    address public tlwAddress;
+
+    constructor(address tokenAddress_, address tlwAddress_) Ownable(msg.sender) {
+        setTokenAddress(tokenAddress_);
+        setTLWAddress(tlwAddress_);
     }
 
-    function getWallets(address user)
-    public view onlyOwner returns (address[] memory) {
-        return wallets[user];
+    function getWallets(address user, uint groupId)
+    public view returns (address[] memory) {
+        return wallets[user][groupId];
     }
 
-    function setTokenAddress(address tokenAddress)
+    function setTokenAddress(address tokenAddress_)
     public onlyOwner {
-        _tokenAddress = tokenAddress;
+        tokenAddress = tokenAddress_;
     }
 
-    function setTLWAddress(address tlwAddress)
+    function setTLWAddress(address tlwAddress_)
     public onlyOwner {
-        _tlwAddress = tlwAddress;
+        tlwAddress = tlwAddress_;
     }
 
-    function newTimeLockedWallet(address owner, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp)
+    function newTimeLockedWallet(address owner, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint vestingDuration, uint initTimestamp)
     public returns (address wallet) {
-        _validateNewTimeLockedWallet(owner, amount);
-        ERC20 token = ERC20(_tokenAddress);
-        require(amount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :amount of tokens");
+        _validateNewTimeLockedWallet(owner, totalAmount, tgeAmount);
 
-        wallet = Clones.clone(_tlwAddress);
-        require(token.transferFrom(msg.sender, wallet, amount), "Token transfer failed");
-        TimeLockedWallet(wallet).initialize(owner, _tokenAddress, amount, cliffDuration, fullDuration, initTimestamp);
+        ERC20 token = ERC20(tokenAddress);
+        require(totalAmount <= token.allowance(msg.sender, address(this)), "This factory contract should be approved to spend :totalAmount of tokens");
 
-        wallets[msg.sender].push(wallet);
+        wallet = Clones.clone(tlwAddress);
+        require(token.transferFrom(msg.sender, wallet, totalAmount), "Token transfer failed");
+        TimeLockedWallet(wallet).initialize(owner, tokenAddress, totalAmount, tgeAmount, cliffDuration, vestingDuration, initTimestamp);
+
+        wallets[msg.sender][groupId].push(wallet);
         if (msg.sender != owner) {
-            wallets[owner].push(wallet);
+            wallets[owner][groupId].push(wallet);
         }
-        emit Created(wallet, msg.sender, owner, amount, cliffDuration, fullDuration, initTimestamp);
+        emit Created(wallet, msg.sender, owner, groupId, totalAmount, tgeAmount, cliffDuration, vestingDuration, initTimestamp);
     }
 
-    function _validateNewTimeLockedWallet(address owner, uint amount)
+    function withdrawAll(address sender, uint groupId)
+    public {
+        for (uint i = 0; i < wallets[sender][groupId].length; i++) {
+            TimeLockedWallet(wallets[sender][groupId][i]).withdraw();
+        }
+    }
+
+    function _validateNewTimeLockedWallet(address owner, uint totalAmount, uint tgeAmount)
     private pure {
         require(owner != address(0), "Owner address is invalid");
-        require(amount > 0, "Amount must be greater than zero");
+        require(totalAmount > 0, "Total amount must be greater than zero");
+        require(tgeAmount <= totalAmount, "TGE amount must not be greater then total amount");
     }
 
-    event Created(address wallet, address from, address to, uint amount, uint cliffDuration, uint fullDuration, uint initTimestamp);
+    event Created(address wallet, address from, address to, uint groupId, uint totalAmount, uint tgeAmount, uint cliffDuration, uint fullDuration, uint initTimestamp);
 
 }
