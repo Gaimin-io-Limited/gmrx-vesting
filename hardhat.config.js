@@ -9,6 +9,9 @@ const noderealApiKey = process.env.NODEREAL_API_KEY;
 module.exports = {
     defaultNetwork: "localhost",
     networks: {
+        localhost: {
+            blockGasLimit: 140000000
+        },
         bnb_chain: {
             url: `https://bsc-mainnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
@@ -26,7 +29,13 @@ module.exports = {
                 version: "0.8.23"
             },
             {
-                version: "0.8.24"
+                version: "0.8.24",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 1_000_000
+                    }
+                }
             }
         ]
     },
