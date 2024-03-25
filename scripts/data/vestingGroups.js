@@ -1,90 +1,78 @@
-const month = 30 * 24 * 60 * 60;
+const day = 24 * 60 * 60;
+const month = 30 * day;
+const tge = 1711447200;//26.03 10 AM GMT
 
-module.exports = [
-    {},//0
-    {//1
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//2
+module.exports = {
+    100: {
         "tgePercent": 0,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
+        "cliffDuration": 6 * month,
+        "vestingDuration": 60 * month,
+        "initTimestamp": tge
     },
-    {//3
-        "tgePercent": 10,
+    200: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    201: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    202: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    203: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    204: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    205: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    206: {
+        "tgePercent": 1,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    300: {
+        "tgePercent": 0,
+        "cliffDuration": 3 * month,
+        "vestingDuration": 18 * month,
+        "initTimestamp": tge
+    },
+    301: {
+        "tgePercent": 100 / 9,
+        "cliffDuration": 1 * month,
+        "vestingDuration": 12 * month,
+        "initTimestamp": tge
+    },
+    302: {
+        "tgePercent": 100,
         "cliffDuration": 0 * month,
-        "vestingDuration": 12 * month
+        "vestingDuration": 0 * month,
+        "initTimestamp": tge + 1 * month
     },
-    {//4
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 0 * month
-    },
-    {//5
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//6
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//7
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//8
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//9
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//10
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//11
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//12
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//13
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//14
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//15
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//16
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
-    },
-    {//17
-        "tgePercent": 10,
-        "cliffDuration": 1 * month,
-        "vestingDuration": 12 * month
+    400: {
+        "tgePercent": 2.5,
+        "cliffDuration": 0 * month,
+        "vestingDuration": 24 * month,
+        "initTimestamp": tge
     }
-]
+}
