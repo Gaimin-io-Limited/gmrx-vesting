@@ -3,12 +3,24 @@ const fs = require('fs');
 const hre = require('hardhat');
 const vestingGroups = require('./data/vestingGroups');
 
-async function callFactory(tokenBuyers) {
-    const tlwFactoryAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const gmrxAddress = "0x998305efDC264b9674178899FFfBb44a47134a76";
+const tlwFactoryAddress = "0x6212ea5f43481A91F3352aB091C11E48B06F4126";
 
+async function callFactory(tokenBuyers) {
     const tokenFactory = await hre.ethers.getContractFactory("GMRX");
-    const token = tokenFactory.attach("0x5FbDB2315678afecb367f032d93F642f64180aa3");
-    let totalAmount = tokenBuyers.reduce((sum, next) => sum + parseInt(next.totalAmount), 0);
+    const token = tokenFactory.attach(gmrxAddress);
+    let totalAmountByGroup = tokenBuyers.reduce((group, curr) => {
+        if (group[curr.groupId]) {
+            group[curr.groupId] += curr.totalAmount;
+        } else {
+            group[curr.groupId] = curr.totalAmount;
+        }
+        return group;
+    }, {});
+    console.log(totalAmountByGroup);
+
+    let totalAmount = Object.values(totalAmountByGroup).reduce((sum, curr) => sum + curr, 0);
+    console.log(totalAmount);
     let approveTx = await token.approve(tlwFactoryAddress, hre.ethers.utils.parseEther(totalAmount.toString()));
     await approveTx.wait();
     console.log('Approved')
@@ -16,7 +28,6 @@ async function callFactory(tokenBuyers) {
     const tlwFactoryContractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
     const tlwFactoryContract = tlwFactoryContractFactory.attach(tlwFactoryAddress);
     let tlws = [];
-
     for (const tokenBuyer of tokenBuyers) {
         let result = await tlwFactoryContract.newTimeLockedWallet(tokenBuyer.owner, tokenBuyer.groupId,
             hre.ethers.utils.parseEther(tokenBuyer.totalAmount.toString()),
@@ -25,12 +36,13 @@ async function callFactory(tokenBuyers) {
         const receiptNewTWL = await result.wait();
         for (let event of receiptNewTWL.events) {
             if (event.event === 'Created') {
-                console.log(event.args[0]);
+                console.log(tokenBuyer.owner, ':', event.args[0]);
                 let tlw = {owner: tokenBuyer.owner, tlw: event.args[0], groupId: tokenBuyer.groupId}
                 tlws.push(tlw)
             }
         }
     }
+
     fs.writeFileSync(__dirname + "/data/NewTimeLock.csv", convertToCSV(tlws))
 }
 
@@ -52,14 +64,14 @@ function convertToCSV(tlws) {
 }
 
 async function parseData(tokenBuyers) {
-    const initTimestamp = 1611447200;
     return new Promise((resolve) => {
         tokenBuyers.forEach(tokenBuyer => {
             let vestingGroup = vestingGroups[tokenBuyer.groupId];
+            tokenBuyer.totalAmount = parseFloat(tokenBuyer.totalAmount);
             tokenBuyer.tgeAmount = tokenBuyer.totalAmount * vestingGroup.tgePercent / 100;
             tokenBuyer.cliffDuration = vestingGroup.cliffDuration;
             tokenBuyer.vestingDuration = vestingGroup.vestingDuration;
-            tokenBuyer.initTimestamp = initTimestamp;
+            tokenBuyer.initTimestamp = vestingGroup.initTimestamp;
         })
         resolve(tokenBuyers);
     })
