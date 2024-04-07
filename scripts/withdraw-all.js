@@ -15,6 +15,10 @@ async function main() {
     // console.log("wallets 301: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 301)).toString());
     // console.log("wallets 302: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 302)).toString());
     // console.log("wallets 400: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 400)).toString());
+    // console.log("wallets 500: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 500)).toString());
+    // console.log("wallets 600: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 600)).toString());
+    // console.log("wallets 700: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 700)).toString());
+    // console.log("wallets 800: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 800)).toString());
     // let tx100 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 100); console.log((await tx100.wait()).gasUsed);
     // let tx200 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 200); console.log((await tx200.wait()).gasUsed);
     // let tx201 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 201); console.log((await tx201.wait()).gasUsed);
@@ -27,6 +31,10 @@ async function main() {
     // let tx301 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 301); console.log((await tx301.wait()).gasUsed);
     // let tx302 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 302); console.log((await tx302.wait()).gasUsed);
     // let tx400 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 400); console.log((await tx400.wait()).gasUsed);
+    // let tx500 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 500); console.log((await tx500.wait()).gasUsed);
+    // let tx600 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 600); console.log((await tx600.wait()).gasUsed);
+    // let tx700 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 700); console.log((await tx700.wait()).gasUsed);
+    // let tx800 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 800); console.log((await tx800.wait()).gasUsed);
 }
 
 main()

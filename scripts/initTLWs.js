@@ -19,7 +19,7 @@ async function callFactory(tokenBuyers) {
     }, {});
     console.log(totalAmountByGroup);
 
-    let totalAmount = Object.values(totalAmountByGroup).reduce((sum, curr) => sum + curr, 0) + 0.000001;
+    let totalAmount = Object.values(totalAmountByGroup).reduce((sum, curr) => sum + curr, 0);
     console.log(totalAmount);
     let approveTx = await token.approve(tlwFactoryAddress, hre.ethers.utils.parseEther(totalAmount.toString()));
     await approveTx.wait();
