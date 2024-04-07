@@ -42,7 +42,7 @@ The `TimeLockedWalletFactory` contract serves as a factory for deploying new ins
 1. Deploy the `TimeLockedWallet` contract first.
 2. Deploy the `TimeLockedWalletFactory` contract, specifying the addresses of the token contract and the `TimeLockedWallet` contract during deployment.
 
-Deployment example could be found [here](/scripts/deploy.js).
+Deployment example could be found [here](/scripts/deploy-factory.js).
 
 ## Usage
 

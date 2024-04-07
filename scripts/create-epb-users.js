@@ -2,8 +2,8 @@ const hre = require("hardhat");
 const fs = require('fs');
 const csv = require("csv-parser");
 
-const gmrxAddress = "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575";
-const engagementPortalBankAddress = "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90";
+const gmrxAddress = "0x998305efDC264b9674178899FFfBb44a47134a76";
+const epbAddress = "0x6a9ff9c45Cbb30e7330691043f6cdF15c3ACc693";
 
 async function createUsers(users) {
     let chunks = [];
@@ -12,14 +12,15 @@ async function createUsers(users) {
         const chunk = users.slice(i, i + chunkSize);
         chunks.push(chunk);
     }
-    console.log(users.length, chunks.length, chunks[chunks.length - 1].length);
+    let totalAmount = users.reduce((sum, curr) => sum + parseInt(curr.totalAmount), 0);
+    console.log(totalAmount, users.length, chunks.length, chunks[chunks.length - 1].length);
 
     const epbContractFactory = await hre.ethers.getContractFactory("EngagementPortalBank");
-    let epbContract = await epbContractFactory.attach(engagementPortalBankAddress);
+    let epbContract = await epbContractFactory.attach(epbAddress);
 
     const tokenFactory = await hre.ethers.getContractFactory("GMRX");
     const token = tokenFactory.attach(gmrxAddress);
-    let approveTx = await token.approve(engagementPortalBankAddress, hre.ethers.utils.parseEther('100000000'));
+    let approveTx = await token.approve(epbAddress, hre.ethers.utils.parseEther('100000000'));
     await approveTx.wait();
     console.log('Approved')
 
