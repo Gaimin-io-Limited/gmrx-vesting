@@ -11,7 +11,7 @@ contract GmrxRate is Ownable{
 
     }
 
-    function addRate(string memory currencyCodes, uint rate) public onlyOwner{
+    function postRate(string memory currencyCodes, uint rate) public onlyOwner{
         currencyToRate[currencyCodes] = rate;
     }
 
