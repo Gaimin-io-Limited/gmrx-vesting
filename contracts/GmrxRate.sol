@@ -2,17 +2,17 @@
 pragma solidity 0.8.24;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IGmrxRate} from "./IGmrxRate.sol";
 
-contract GmrxRate is Ownable{
+contract GmrxRate is Ownable, IGmrxRate {
 
     mapping(string => uint) public currencyToRate;
 
     constructor(address _initialOwner) Ownable(_initialOwner) {
-
     }
 
-    function postRate(string memory currencyCodes, uint rate) public onlyOwner{
-        currencyToRate[currencyCodes] = rate;
+    function postRate(string memory currencyPair, uint rate) external onlyOwner {
+        currencyToRate[currencyPair] = rate;
     }
 
 }
