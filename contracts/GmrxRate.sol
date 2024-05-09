@@ -8,8 +8,7 @@ contract GmrxRate is Ownable, IGmrxRate {
 
     mapping(string => uint) public currencyToRate;
 
-    constructor(address _initialOwner) Ownable(_initialOwner) {
-    }
+    constructor() Ownable(msg.sender) {}
 
     function postRate(string memory currencyPair, uint rate) external onlyOwner {
         currencyToRate[currencyPair] = rate;
