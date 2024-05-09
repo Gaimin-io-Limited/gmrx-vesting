@@ -19,10 +19,13 @@ async function main() {
     // console.log("wallets 600: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 600)).toString());
     // console.log("wallets 700: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 700)).toString());
     // console.log("wallets 800: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 800)).toString());
+    // Done
+    // let tx302 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 302); console.log((await tx302.wait()).gasUsed);
+    // Tuesday from 26.03.2024
     let tx400 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 400); console.log((await tx400.wait()).gasUsed);
     let tx600 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 600); console.log((await tx600.wait()).gasUsed);
     let tx800 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 800); console.log((await tx800.wait()).gasUsed);
-    let tx302 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 302); console.log((await tx302.wait()).gasUsed);
+    // Thursday from 02.05.2024
     let tx200 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 200); console.log((await tx200.wait()).gasUsed);
     let tx201 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 201); console.log((await tx201.wait()).gasUsed);
     let tx202 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 202); console.log((await tx202.wait()).gasUsed);
