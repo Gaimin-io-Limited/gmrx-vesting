@@ -1,6 +1,8 @@
 const day = 24 * 60 * 60;
+const week = 7 * day;
 const month = 30 * day;
-const tge = 1711447200;//26.03 10 AM GMT
+const tge = 1711447200;//26.03.2024 10 AM GMT
+const custom1 = 1715335200;//10.05.2024 10 AM GMT
 
 module.exports = {
     100: {
@@ -113,6 +115,27 @@ module.exports = {
         "tgePercent": 2.5,
         "cliffDuration": 0 * month,
         "vestingDuration": 24 * month,
+        "initTimestamp": tge
+    },
+    900: {
+        "name": "Seed (VCs)",
+        "tgePercent": 0,
+        "cliffDuration": 5 * month,
+        "vestingDuration": 28 * month,
+        "initTimestamp": tge
+    },
+    1000: {
+        "name": "Private 1 and Private 2 (VCs)",
+        "tgePercent": 0,
+        "cliffDuration": 3 * month,
+        "vestingDuration": 24 * month,
+        "initTimestamp": tge
+    },
+    1100: {
+        "name": "Private 3 (VCs)",
+        "tgePercent": 0,
+        "cliffDuration": 2 * month,
+        "vestingDuration": 18 * month,
         "initTimestamp": tge
     }
 }
