@@ -36,7 +36,7 @@ async function callFactory(tokenBuyers) {
         const receiptNewTWL = await result.wait();
         for (let event of receiptNewTWL.events) {
             if (event.event === 'Created') {
-                console.log(tokenBuyer.owner, ':', event.args[0]);
+                console.log(tokenBuyer.owner, ',', event.args[0], ',', tokenBuyer.groupId);
                 let tlw = {owner: tokenBuyer.owner, tlw: event.args[0], groupId: tokenBuyer.groupId}
                 tlws.push(tlw)
             }

@@ -15,7 +15,8 @@ module.exports = {
         bnb_chain: {
             url: `https://bsc-mainnet.nodereal.io/v1/${noderealApiKey}`,
             accounts: [privateKey],
-            chainId: 56
+            chainId: 56,
+            // gasPrice: 3_000_000_000
         },
         bnb_chain_testnet: {
             url: `https://bsc-testnet.nodereal.io/v1/${noderealApiKey}`,

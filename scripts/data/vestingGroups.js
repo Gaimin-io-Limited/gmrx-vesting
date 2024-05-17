@@ -137,5 +137,19 @@ module.exports = {
         "cliffDuration": 2 * month,
         "vestingDuration": 18 * month,
         "initTimestamp": tge
+    },
+    1200: {
+        "name": "Private 4 (VCs)",
+        "tgePercent": 0,
+        "cliffDuration": 0 * month,
+        "vestingDuration": 49 * week,
+        "initTimestamp": custom1
+    },
+    1300: {
+        "name": "KOLs and KOLs (2)",
+        "tgePercent": 0,
+        "cliffDuration": 0 * month,
+        "vestingDuration": 49 * week,
+        "initTimestamp": custom1
     }
 }
