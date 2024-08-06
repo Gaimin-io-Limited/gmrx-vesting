@@ -26,9 +26,10 @@ async function main() {
     // Chainlink let tx1300 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1300); console.log((await tx1300.wait()).gasUsed);
     // Saturday from 01.06.24
     // Chainlink let tx1100 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1100); console.log((await tx1100.wait()).gasUsed);
+    // Monday from 01.07.24
+    // Chainlink let tx1000 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1000); console.log((await tx1000.wait()).gasUsed);
+    // Chainlink let tx300 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 300); console.log((await tx300.wait()).gasUsed);
 
-    //01.07.24 let tx1000 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1000); console.log((await tx1000.wait()).gasUsed);
-    //01.07.24 let tx300 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 300); console.log((await tx300.wait()).gasUsed);
     //30.08.24 let tx900 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 900); console.log((await tx900.wait()).gasUsed);
     //29.09.24 let tx100 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 100); console.log((await tx100.wait()).gasUsed);
     //29.09.24 let tx500 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 500); console.log((await tx500.wait()).gasUsed);
