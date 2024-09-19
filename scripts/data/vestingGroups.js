@@ -1,8 +1,10 @@
 const day = 24 * 60 * 60;
 const week = 7 * day;
 const month = 30 * day;
-const tge = 1711447200;//26.03.2024 10 AM GMT
-const custom1 = 1715335200;//10.05.2024 10 AM GMT
+const tge = 1711447200;     // 26.03.2024 10 AM GMT
+const custom1 = 1715335200; // 10.05.2024 10 AM GMT
+const custom2 = 1725962400; // 10.09.2024 10 AM GMT
+const custom3 = 1724752800; // 27.08.2024 10 AM GMT
 
 module.exports = {
     100: {
@@ -151,5 +153,19 @@ module.exports = {
         "cliffDuration": 0 * month,
         "vestingDuration": 49 * week,
         "initTimestamp": custom1
+    },
+    1400: {
+        "name": "Mickey",
+        "tgePercent": 0,
+        "cliffDuration": 0 * month,
+        "vestingDuration": 16 * month,
+        "initTimestamp": custom2
+    },
+    1500: {
+        "name": "Casey (Papi)",
+        "tgePercent": 0,
+        "cliffDuration": 0 * month,
+        "vestingDuration": 24 * month,
+        "initTimestamp": custom3
     }
 }

@@ -3,8 +3,6 @@ const hre = require("hardhat");
 async function main() {
     const tlwFactoryContractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
     const tlwFactoryContract = tlwFactoryContractFactory.attach("0x6212ea5f43481A91F3352aB091C11E48B06F4126");
-    // console.log("wallets 1200: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1200)).toString());
-    // console.log("wallets 1300: ", (await tlwFactoryContract.getWallets("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1300)).toString());
     // Done
     // let tx302 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 302); console.log((await tx302.wait()).gasUsed);
 
@@ -31,9 +29,14 @@ async function main() {
     // Chainlink let tx300 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 300); console.log((await tx300.wait()).gasUsed);
     // Friday from 30.08.24
     // Chainlink let tx900 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 900); console.log((await tx900.wait()).gasUsed);
+    // Thursday from 26.09.24 Monthly
+    // Chainlink let tx1500 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1500); console.log((await tx1500.wait()).gasUsed);
+    // Sunday from 29.09.24
+    // Chainlink let tx100 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 100); console.log((await tx100.wait()).gasUsed);
+    // Chainlink let tx500 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 500); console.log((await tx500.wait()).gasUsed);
+    // Thursday from 10.10.24 Monthly
+    // Chainlink let tx1400 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1400); console.log((await tx1400.wait()).gasUsed);
 
-    //29.09.24 let tx100 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 100); console.log((await tx100.wait()).gasUsed);
-    //29.09.24 let tx500 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 500); console.log((await tx500.wait()).gasUsed);
     //28.03.25 let tx700 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 700); console.log((await tx700.wait()).gasUsed);
 }
 

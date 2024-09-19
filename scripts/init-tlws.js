@@ -23,7 +23,7 @@ async function callFactory(tokenBuyers) {
     console.log(totalAmount);
     let approveTx = await token.approve(tlwFactoryAddress, hre.ethers.utils.parseEther(totalAmount.toString()));
     await approveTx.wait();
-    console.log('Approved')
+    console.log('Approved');
 
     const tlwFactoryContractFactory = await hre.ethers.getContractFactory("TimeLockedWalletFactory");
     const tlwFactoryContract = tlwFactoryContractFactory.attach(tlwFactoryAddress);
