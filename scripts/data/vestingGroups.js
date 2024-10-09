@@ -167,5 +167,12 @@ module.exports = {
         "cliffDuration": 0 * month,
         "vestingDuration": 24 * month,
         "initTimestamp": custom3
+    },
+    1600: {
+        "name": "Blake",
+        "tgePercent": 0,
+        "cliffDuration": 12 * month,
+        "vestingDuration": 36 * month,
+        "initTimestamp": tge
     }
 }

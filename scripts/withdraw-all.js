@@ -38,6 +38,7 @@ async function main() {
     // Chainlink let tx1400 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1400); console.log((await tx1400.wait()).gasUsed);
 
     //28.03.25 let tx700 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 700); console.log((await tx700.wait()).gasUsed);
+    //28.03.25 let tx1600 = await tlwFactoryContract.withdrawAll("0xb27b44DF91D33338A024097172dc946D4445a3E2", 1600); console.log((await tx1600.wait()).gasUsed);
 }
 
 main()
